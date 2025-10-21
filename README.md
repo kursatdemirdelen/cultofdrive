@@ -5,7 +5,7 @@
 
 ---
 
-![Cult of Drive Preview](public/bmw-e36.jpg)
+![Cult of Drive Preview](public/s.jpg)
 
 ## ✨ Overview
 
