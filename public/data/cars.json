@@ -1,0 +1,103 @@
+[
+{
+  "id": "1",
+  "model": "BMW E46 M3 Cabriolet",
+  "year": 2002,
+  "owner": "Yasin Davulcu",
+  "instagramHandle": "@yasindavulcu",
+  "description": "My daily-driven E46 M3 Cabriolet since 2024. Fully stock with OEM+ maintenance. Driven year-round in Wroclaw—rain, snow, and city traffic included.",
+  "imageUrl": "/images/e46-yasin.png",
+  "specs": [
+    "S54B32 Engine (3.2L I6, 333 HP)",
+    "6-Speed Getrag 420G Manual",
+    "Titanium Silver Metallic (Code 354)",
+    "Dark blue Soft Top, OEM Laguna seca blue Interior"
+  ],
+  "tags": ["M3", "E46", "Cabriolet", "Daily", "Stock", "TitaniumSilver"]
+},
+ {
+  "id": "2",
+  "model": "BMW E36 328i Coupe",
+  "year": 1997,
+  "owner": "Jonathan",
+  "instagramHandle": "@j.tran42",
+  "description": "A rare Techno Violet (Code 354) E36 328i Coupe — a true head-turner. Fully restored with OEM+ stance, factory M-Tech II body kit, and period-correct Style 24 Motorsport wheels. Daily driven with love and precision.",
+  "imageUrl": "/images/technoviolet-e36.png",
+  "specs": [
+    "M52B28 Engine (2.8L I6)",
+    "5-Speed Manual Transmission",
+    "Techno Violet Metallic (Code 354)",
+    "OEM M-Tech II Body Kit, Style 24 Motorsport 17\" Wheels, H&R Coilovers"
+  ],
+  "tags": ["E36", "Coupe", "TechnoViolet", "Manual", "OEM+", "Style24", "Daily"]
+},
+ 
+ {
+  "id": "3",
+  "model": "BMW E36 M3 Sedan",
+  "year": 1998,
+  "owner": "Mike",
+  "instagramHandle": "@mike.bevels",
+  "description": "Mike's Schwarz II 1998 E36 M3 Sedan — a US-spec manual built for both journalism and spirited driving, featuring Boa Boa Recaro seats in black/blue, Euro-style amber turn signals, and classic BBS LM wheels.",
+  "imageUrl": "/images/e36-mike.png",
+  "specs": [
+    "S52B32 (US-spec)",
+    "5-speed manual transmission",
+    "Schwarz II (Paint Code 669)",
+    "Boa Boa Recaro sport seats ",
+    "Amber front turn signals ",
+    "BBS LM wheels"
+  ],
+  "tags": ["M3", "E36", "Sedan", "Journalist", "Enthusiast"]
+},
+{
+  "id": "4",
+  "model": "BMW E36 M3",
+  "year": 1997,
+  "owner": "John",
+  "instagramHandle": "@whatsvanos",
+  "description": "John's Titanium Silver E36 M3, powered by the US-spec S52 engine. Owned and meticulously maintained for over 11 years as a true OEM+ daily driver.",
+  "imageUrl": "/images/e36-whatsvanos.jpg",
+  "specs": [
+    "S52B32 (US-spec)",
+    "5-speed manual transmission",
+    "Titanium Silver Metallic (Paint Code 354)",
+    "Gray dashboard with white leather interior",
+    "H&R Sport Springs / Bilstein struts",
+    "Style 24 M wheels"
+  ],
+  "tags": ["M3", "E36", "Daily"]
+},
+{
+  "id": "5",
+  "model": "BMW E39 525i",
+  "year": 2002,
+  "owner": "f3hmii",
+  "instagramHandle": "@f3hmii",
+  "description": "1 of 33 Chiaretto Red E39 525i in Sweden. Rare color, clean condition, and well-maintained. Driven daily with pride.",
+  "imageUrl": "/images/f3hmii-e39.png",
+  "specs": [
+    "M54B25 Engine (2.5L I6, 192 HP)",
+    "5-Speed Getrag 250 Manual",
+    "Chiaretto Red (Code 308)",
+    "Limited Edition: 1/33 units in Sweden"
+  ],
+  "tags": ["E39", "525i", "ChiarettoRed", "Rare"]
+},
+ {
+  "id": "6",
+  "model": "BMW E46 325i Sedan",
+  "year": 2003,
+  "owner": "Knight",
+  "instagramHandle": "@e46knight",
+  "description": "This E46 isn’t just a car, it’s a family member. With nearly 20 years of ownership, almost 300k miles on the odometer, M54B30/6 speed swaps & more, it’s been through many phases of life, and I hope it stays with me for many more.",
+  "imageUrl": "/images/e46-knight.jpg",
+  "specs": [
+    "M54B30 Engine (3L I6)",
+    "6-Speed Manual Transmission",
+    "Orientblau Metallic (Code 317)",
+    "Silvers Coilovers, Apex EC-7 wheels"
+  ],
+  "tags": ["E46", "Sedan", "Orientblau Metallic", "Manual", "Daily", "M54"]
+}
+]
