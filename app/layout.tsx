@@ -1,44 +1,36 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import React from 'react';
+import { Inter } from 'next/font/google';
+import type { ReactNode } from 'react';
+
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Cult of Drive - Authentic BMW Culture | Coming Soon',
-  description:
-    "Join the waitlist for Cult of Drive - the ultimate destination for 90s–2000s BMW enthusiasts. Authentic, OEM, Driver's Cars Only. Coming Soon.",
-  keywords: [
-    'BMW',
-    'E36',
-    'M3',
-    'BMW culture',
-    'vintage BMW',
-    'BMW community',
-    'coming soon',
-  ],
+  title: 'Cult of Drive — 90s–2000s BMW Culture',
+  description: 'Experience the golden era of BMW. Pure driving machines, no compromises. Join the community for classic BMW enthusiasts.',
+  keywords: ['BMW', 'E36', 'E46', 'classic cars', '90s BMW', '2000s BMW', 'driving culture', 'automotive community'],
   authors: [{ name: 'Cult of Drive' }],
   creator: 'Cult of Drive',
   publisher: 'Cult of Drive',
   openGraph: {
-    title: 'Cult of Drive - Authentic BMW Culture',
-    description:
-      'Join the waitlist for the ultimate BMW enthusiast community. 90s–2000s BMW culture at its finest.',
-    url: 'https://cultofdrive.com',
+    title: 'Cult of Drive — 90s–2000s BMW Culture',
+    description: 'Experience the golden era of BMW. Pure driving machines, no compromises.',
     siteName: 'Cult of Drive',
+    locale: 'en_US',
+    type: 'website',
     images: [
       {
         url: '/bmw-e36.jpg',
-        width: 800,
+        width: 1200,
         height: 600,
-        alt: 'BMW E36 M3 - Cult of Drive',
+        alt: 'BMW E36 - Cult of Drive',
       },
     ],
-    locale: 'en_US',
-    type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Cult of Drive - Authentic BMW Culture',
-    description: 'Join the waitlist for the ultimate BMW enthusiast community.',
+    title: 'Cult of Drive — 90s–2000s BMW Culture',
+    description: 'Experience the golden era of BMW. Pure driving machines, no compromises.',
     images: ['/bmw-e36.jpg'],
   },
   robots: {
@@ -52,16 +44,19 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  verification: {
+    google: 'your-google-verification-code', // Replace with actual verification code
+  },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+interface RootLayoutProps {
+  children: ReactNode;
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en">
-      <body className="text-white bg-black">{children}</body>
+    <html lang="en" className={inter.className}>
+      <body>{children}</body>
     </html>
   );
 }

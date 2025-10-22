@@ -21,7 +21,7 @@ Built for enthusiasts, by enthusiasts — merging aesthetics, performance, and s
 | **Next.js 15 (App Router)** | Modern React framework optimized for performance and DX |
 | **Tailwind CSS** | Utility-first CSS for responsive, clean UI |
 | **Framer Motion** | Smooth, fluid animations and transitions |
-| **Biome** | Fast linting, formatting, and code quality checks |
+| **ESLint** | Code linting and quality checks |
 | **TypeScript** | Static typing for reliability and scalability |
 | **Vercel** | Zero-config cloud deployment |
 
@@ -36,13 +36,23 @@ git clone https://github.com/kursatdemirdelen/cultofdrive.git
 cd cultofdrive
 ```
 
-### 2. Install dependencies
+### 2. Environment Setup
+
+Copy the environment example file and fill in your Supabase credentials:
+
+```bash
+cp env.example .env.local
+```
+
+Then edit `.env.local` with your actual Supabase URL and API key.
+
+### 3. Install dependencies
 
 ```bash
 npm install
 ```
 
-### 3. Run the development server
+### 4. Run the development server
 
 ```bash
 npm run dev
@@ -54,16 +64,10 @@ Now open [http://localhost:3000](http://localhost:3000) to see it live 🚀
 
 ## 🧹 Lint & Formatting
 
-This project uses **Biome** instead of ESLint and Prettier.
+This project uses **ESLint** for code linting and quality checks.
 
 ```bash
 npm run lint
-```
-
-If you prefer ESLint, install it manually:
-
-```bash
-npm install eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin --save-dev
 ```
 
 ---
@@ -80,9 +84,8 @@ cultofdrive/
 ├── public/
 │   ├── bmw-e36.jpg      # Hero image
 │
-├── tailwind.config.ts
-├── postcss.config.mjs
-├── biome.json
+├── tailwind.config.js
+├── postcss.config.js
 ├── package.json
 └── README.md
 ```
@@ -106,14 +109,14 @@ export const metadata = {
 
 ---
 
-## 💌 Waitlist Integration (optional)
+## 💌 Waitlist Integration
 
-You can easily integrate a mailing list with:
-- **Supabase** (database & auth)
-- **Resend** (email delivery API)
-- **Formspree** (simple form endpoint)
+This project includes a fully functional email subscription system:
+- **Supabase** (database for storing emails)
+- **API Route** (`/api/subscribe`) for handling subscriptions
+- **Email Form Component** with validation and error handling
 
-Add your API endpoint in the `handleEmailSubmit()` function inside `page.tsx`.
+The email subscription is already integrated and ready to use!
 
 ---
 
@@ -133,9 +136,9 @@ vercel deploy
 
 ## 🧭 Roadmap
 
-- [ ] Add backend integration for email waitlist  
+- [x] Add backend integration for email waitlist  
 - [ ] Include Instagram / Twitter live feed  
-- [ ] Introduce “Driver’s Garage” gallery  
+- [ ] Introduce "Driver's Garage" gallery  
 - [ ] Add multilingual support (EN/TR)  
 
 ---
