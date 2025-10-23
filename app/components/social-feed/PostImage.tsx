@@ -21,6 +21,10 @@ export default function PostImage({
         alt={`${username} post`}
         fill
         className="object-cover transition-transform duration-300 group-hover:scale-105 group-hover:brightness-105"
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+        placeholder="blur"
+        blurDataURL="data:image/jpeg;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNby..." // basit base64 placeholder
+        quality={85}
       />
       <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/60 to-transparent" />
 

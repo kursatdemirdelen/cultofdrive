@@ -30,6 +30,10 @@ export default function CarCard({ car, index, onClick }: CarCardProps) {
           alt={car.model}
           fill
           className="object-cover transition-transform duration-300 hover:scale-105"
+          quality={90}
+          placeholder="blur"
+          blurDataURL="/placeholder-car.png"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
         <div className="absolute px-3 py-1 text-sm font-medium text-white rounded-lg top-4 left-4 bg-black/50 backdrop-blur-sm">
           {car.year}
