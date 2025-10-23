@@ -11,7 +11,7 @@ interface HeroSectionProps {
 
 export default function HeroSection({ scrollToSection }: HeroSectionProps) {
   return (
-    <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
+    <div className="relative z-10 flex items-center justify-center min-h-screen px-4 bg-gradient-to-b from-gray-900 to-black">
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}

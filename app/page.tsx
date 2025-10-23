@@ -13,21 +13,18 @@ export default function Home() {
 
   return (
     <>
-      <main className="relative min-h-screen overflow-hidden bg-gradient-to-b from-gray-900 to-black">
-        {/* Radial grid overlay */}
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.1)_1px,transparent_0)] bg-[length:24px_24px]" />
-
+      <main className="relative min-h-screen overflow-hidden ">
         {/* Hero Section */}
         <HeroSection scrollToSection={scrollToSection} />
-
-        {/* Social Feed */}
-        <section id="social-feed">
-          <SocialFeed />
-        </section>
 
         {/* Driver's Garage */}
         <section id="garage">
           <DriversGarage />
+        </section>
+
+        {/* Social Feed */}
+        <section id="social-feed">
+          <SocialFeed />
         </section>
 
         {/* Footer */}

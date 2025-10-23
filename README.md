@@ -1,12 +1,12 @@
+![Cult of Drive](/public/images/bmw-e36.png)
+
 # 🚗 Cult of Drive
 
 > **90s–2000s BMW Culture. Authentic. OEM. Driver’s Cars Only.**  
 > A digital homage to the golden era of BMW — built with Next.js 15, Tailwind CSS, and Framer Motion.
 
 ---
-
-![Cult of Drive Preview](public/s.jpg)
-
+  
 ## ✨ Overview
 
 **Cult of Drive** is a clean, minimal, and atmospheric landing page celebrating the pure driving spirit of 90s and early 2000s BMWs.  
