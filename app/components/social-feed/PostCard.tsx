@@ -20,7 +20,7 @@ export default function PostCard({ post }: PostCardProps) {
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       viewport={{ once: true }}
-      className="overflow-hidden border rounded-2xl bg-white/5 backdrop-blur hover:bg-white/10 border-white/10"
+      className="overflow-hidden transition-colors duration-300 border rounded-lg  border-white/5 bg-carbon/40 hover:bg-carbon/50"
     >
       {post.imageUrl && (
         <PostImage
@@ -42,10 +42,10 @@ export default function PostCard({ post }: PostCardProps) {
             />
           </div>
           <div>
-            <h4 className="text-sm font-semibold text-white">
+            <h4 className="text-sm font-medium text-white/90">
               {post.username}
             </h4>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-white/40">
               {post.timestamp
                 ? formatDistanceToNow(new Date(post.timestamp), {
                     addSuffix: true,
@@ -56,7 +56,7 @@ export default function PostCard({ post }: PostCardProps) {
         </div>
 
         <p
-          className={`mb-4 text-sm text-gray-300 leading-relaxed ${
+          className={`mb-4 text-sm text-white/70 leading-relaxed ${
             !expanded ? "line-clamp-4" : ""
           }`}
         >
@@ -65,7 +65,7 @@ export default function PostCard({ post }: PostCardProps) {
         {post.content.length > 200 && (
           <button
             onClick={() => setExpanded(!expanded)}
-            className="text-xs text-blue-400 hover:text-blue-300"
+            className="text-xs transition-colors text-white/50 hover:text-white/70"
           >
             {expanded ? "Show Less" : "Show More"}
           </button>

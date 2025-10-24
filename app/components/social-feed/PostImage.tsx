@@ -22,8 +22,6 @@ export default function PostImage({
         fill
         className="object-cover transition-transform duration-300 group-hover:scale-105 group-hover:brightness-105"
         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-        placeholder="blur"
-        blurDataURL="data:image/jpeg;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNby..." // basit base64 placeholder
         quality={85}
       />
       <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/60 to-transparent" />
@@ -37,9 +35,9 @@ export default function PostImage({
         href={postUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="absolute inset-0 flex items-center justify-center text-sm font-medium text-white transition-opacity duration-300 opacity-0 bg-black/20 group-hover:opacity-100 rounded-xl"
+        className="absolute inset-0 flex items-center justify-center text-sm font-medium transition-opacity duration-300 rounded-md opacity-0  bg-carbon/60 group-hover:opacity-100 text-white/80 hover:text-white"
       >
-        <Instagram className="w-5 h-5 mr-2 text-pink-500" />
+        <Instagram className="w-5 h-5 mr-2 text-white/75" />
         View
       </a>
     </div>

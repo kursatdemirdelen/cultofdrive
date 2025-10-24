@@ -8,7 +8,11 @@ export default function CarTags({ tags }: CarTagsProps) {
       {tags.map((tag) => (
         <span
           key={tag}
-          className="px-3 py-1 text-sm text-blue-300 border rounded-full bg-blue-600/20 border-blue-600/30"
+          className="
+            px-3 py-[6px] text-sm
+            bg-white/10 backdrop-blur-sm
+            text-white/80 rounded-[6px]
+          "
         >
           {tag}
         </span>

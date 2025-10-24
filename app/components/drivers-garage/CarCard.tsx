@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import type { Car } from "../types/car.types";
+import { UserCircle } from "lucide-react";
 
 interface CarCardProps {
   car: Car;
@@ -21,28 +22,36 @@ export default function CarCard({ car, index, onClick }: CarCardProps) {
     <motion.div
       {...fadeUp}
       transition={{ ...fadeUp.transition, delay: index * 0.1 }}
-      className="overflow-hidden transition-all border cursor-pointer rounded-xl bg-white/5 backdrop-blur-sm border-white/10 hover:border-white/20 hover:shadow-lg"
+      className="overflow-hidden transition-colors border rounded-lg cursor-pointer bg-carbon/40 border-white/5 hover:bg-carbon/50"
       onClick={onClick}
     >
-      <div className="relative h-64 overflow-hidden rounded-t-xl">
+      <div className="relative h-64 overflow-hidden rounded-t-lg">
         <Image
           src={car.imageUrl}
           alt={car.model}
           fill
-          className="object-cover transition-transform duration-300 hover:scale-105"
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
           quality={90}
           placeholder="blur"
-          blurDataURL="/placeholder-car.png"
+          blurDataURL="/images/e36-placeholder.png"
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         />
-        <div className="absolute px-3 py-1 text-sm font-medium text-white rounded-lg top-4 left-4 bg-black/50 backdrop-blur-sm">
+        <div
+          className="
+          absolute top-4 left-4 px-3 py-1 text-sm font-medium text-white/90
+          bg-carbon/70 border border-white/10 rounded-[4px]
+        "
+        >
           {car.year}
         </div>
       </div>
       <div className="p-5">
-        <h3 className="mb-1 text-xl font-medium text-white">{car.model}</h3>
-        <p className="mb-2 text-sm text-blue-400">Owner: {car.owner}</p>
-        <p className="text-sm text-gray-300 line-clamp-3">{car.description}</p>
+        <h3 className="mb-1 text-xl font-medium text-white/90">{car.model}</h3>
+        <p className="flex items-center gap-2 mb-4 text-sm text-white/80">
+          <UserCircle className="w-5 h-5 text-white/70" />
+          {car.owner}
+        </p>
+        <p className="text-sm text-white/60 line-clamp-3">{car.description}</p>
       </div>
     </motion.div>
   );

@@ -28,9 +28,15 @@ export default function HeroNavigation({ onNavigate }: HeroNavigationProps) {
             <button
               key={item.id}
               onClick={() => onNavigate(item.id)}
-              className="flex items-center gap-2 px-5 py-2 text-sm font-medium text-white transition-all duration-300 shadow-sm rounded-2xl bg-white/10 backdrop-blur-sm hover:bg-white/20 hover:scale-105 active:scale-95 shadow-black/20"
+              className="
+                flex items-center gap-2 px-5 py-2 text-sm font-medium
+                rounded-md bg-carbon/40 text-white/75
+                transition-colors duration-200
+                hover:bg-carbon/50 hover:text-white
+                hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]
+              "
             >
-              <Icon className="w-5 h-5 text-white/80" />
+              <Icon className="w-5 h-5 text-white/65" />
               {item.label}
             </button>
           );

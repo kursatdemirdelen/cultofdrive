@@ -1,3 +1,6 @@
+/* postcss */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -12,7 +15,7 @@
 
   body {
     overflow-x: hidden;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     background: linear-gradient(180deg, #0a0a0a 0%, #000 100%);
     color: #fff;
@@ -26,16 +29,36 @@
     color: #fff;
   }
 
-  /* Subtle parallax layer */
+  /* spotlight */
   body::before {
-    content: '';
+    content: "";
     position: fixed;
     inset: 0;
-    background: radial-gradient(circle at 20% 30%, rgba(255,255,255,0.05), transparent 60%);
+    background: radial-gradient(
+      circle at 50% 25%,
+      rgba(255, 255, 255, 0.12),
+      transparent 60%
+    );
     pointer-events: none;
     z-index: 0;
-    transform: translateZ(0);
-    will-change: transform;
+  }
+
+  /* grain texture */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.03) 0px,
+      rgba(255, 255, 255, 0.03) 1px,
+      transparent 1px,
+      transparent 2px
+    );
+    opacity: 0.18;
+    mix-blend-mode: soft-light;
+    z-index: 999;
   }
 
   a {
@@ -55,6 +78,7 @@
   .line-clamp-4 {
     display: -webkit-box;
     -webkit-line-clamp: 4;
+    line-clamp: 4;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
@@ -85,3 +109,17 @@ section {
   scroll-snap-align: start;
   scroll-margin-top: 1rem;
 }
+
+@layer components {
+  .btn-motorsport {
+    @apply px-5 py-2 font-medium tracking-wide uppercase transition-colors duration-200 border rounded-none;
+    @apply text-white border-white/20 bg-white/5 hover:bg-white/10;
+  }
+
+  .btn-motorsport-primary {
+    @apply px-6 py-2 font-semibold tracking-wide uppercase transition duration-200 rounded-none;
+    @apply bg-gradient-to-r from-[#0055ff] via-[#c40000] to-[#00a0ff] text-white border-0;
+    @apply hover:brightness-110;
+  }
+}
+

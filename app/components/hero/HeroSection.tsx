@@ -18,21 +18,26 @@ export default function HeroSection({ scrollToSection }: HeroSectionProps) {
         transition={{ duration: 0.6 }}
         className="w-full max-w-3xl"
       >
-        <div className="p-12 bg-black/40 backdrop-blur-xl rounded-xl md:p-12">
+        <div className="p-10 border bg-black/50 backdrop-blur-lg rounded-xl border-white/5 md:p-12">
           {/* Header */}
-          <header className="mb-6 text-center">
-            <h1 className="mb-4 text-4xl font-light text-white md:text-5xl">
-              Cult of Drive
+          <header className="mb-8 text-center">
+            <h1 className="mb-3 text-5xl font-heading tracking-[0.12em] text-white md:text-6xl">
+              CULT OF DRIVE
             </h1>
-            <p className="max-w-lg mx-auto text-lg text-gray-400">
-              Experience the golden era of BMW. Pure driving machines, no
-              compromises.
+
+            {/* BMW Affinity Accent */}
+            <div className="mx-auto mb-6 h-[3px] w-[180px] bg-gradient-to-r from-[#00a0ff] via-[#0055ff] to-[#c40000] rounded-full opacity-90" />
+
+            <p className="max-w-lg mx-auto mb-8 text-[17px] text-gray-300 tracking-wide leading-relaxed">
+              Experience the golden era of BMW — analog machines built for
+              drivers, not passengers.
             </p>
 
             <HeroNavigation onNavigate={scrollToSection} />
           </header>
 
           <HeroImage />
+
           <CommunitySection />
         </div>
       </motion.div>
