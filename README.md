@@ -91,26 +91,6 @@ cultofdrive/
 └── README.md
 ```
 
----
-
-## 🖼️ Media Assets (`public/images/`)
-
-| File | Format | Description |
-|------|--------|-------------|
-| `alpinwhite-e36.png` | PNG | Alpine White BMW E36 coupe angle shot |
-| `bmw-e36.png` | PNG | Primary hero image used for previews |
-| `dailye36-touring.png` | PNG | Daily-driven BMW E36 touring profile |
-| `e36-mike.png` | PNG | Enthusiast portrait with BMW E36 |
-| `e36-placeholder.png` | PNG | Placeholder asset for gallery slots |
-| `e36-whatsvanos.jpg` | JPG | Technical close-up featuring VANOS details |
-| `e46-knight.jpg` | JPG | BMW E46 night-time rolling shot |
-| `e46-yasin.png` | PNG | Owner spotlight portrait with BMW E46 |
-| `f3hmii-e39.png` | PNG | BMW E39 stance-focused profile |
-| `profile.png` | PNG | Default community avatar |
-| `technoviolet-e36.png` | PNG | Technoviolet BMW E36 coupe |
-
----
-
 ## 🖋️ Metadata
 
 ```ts
@@ -181,10 +161,10 @@ vercel deploy
 
 ## 🧭 Roadmap
 
-- [x] Add backend integration for email waitlist  
-- [ ] Include Instagram / Twitter live feed  
-- [ ] Introduce "Driver's Garage" gallery  
-- [ ] Add multilingual support (EN/TR)  
+- [x] Add backend integration for email waitlist
+- [x] Include Instagram live feed
+- [x] Introduce "Driver's Garage" gallery
+- [ ] Add multilingual support (EN/TR)
 
 ---
 
