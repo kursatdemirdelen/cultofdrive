@@ -77,18 +77,37 @@ npm run lint
 ```
 cultofdrive/
 ├── app/
-│   ├── layout.tsx       # Root layout + metadata
-│   ├── page.tsx         # Landing page
-│   ├── globals.css      # Global styles
-│
+│   ├── api/subscribe/route.ts # Supabase waitlist endpoint
+│   ├── components/            # UI composition (hero, drivers garage, social feed)
+│   ├── globals.css            # Global styles
+│   ├── layout.tsx             # Root layout + metadata
+│   └── page.tsx               # Landing page
 ├── public/
-│   ├── bmw-e36.jpg      # Hero image
-│
+│   └── images/                # Marketing imagery & profile assets
+├── utils/                     # Client helpers (e.g. supabase client)
 ├── tailwind.config.js
 ├── postcss.config.js
 ├── package.json
 └── README.md
 ```
+
+---
+
+## 🖼️ Media Assets (`public/images/`)
+
+| File | Format | Description |
+|------|--------|-------------|
+| `alpinwhite-e36.png` | PNG | Alpine White BMW E36 coupe angle shot |
+| `bmw-e36.png` | PNG | Primary hero image used for previews |
+| `dailye36-touring.png` | PNG | Daily-driven BMW E36 touring profile |
+| `e36-mike.png` | PNG | Enthusiast portrait with BMW E36 |
+| `e36-placeholder.png` | PNG | Placeholder asset for gallery slots |
+| `e36-whatsvanos.jpg` | JPG | Technical close-up featuring VANOS details |
+| `e46-knight.jpg` | JPG | BMW E46 night-time rolling shot |
+| `e46-yasin.png` | PNG | Owner spotlight portrait with BMW E46 |
+| `f3hmii-e39.png` | PNG | BMW E39 stance-focused profile |
+| `profile.png` | PNG | Default community avatar |
+| `technoviolet-e36.png` | PNG | Technoviolet BMW E36 coupe |
 
 ---
 
@@ -102,7 +121,7 @@ export const metadata = {
   openGraph: {
     title: 'Cult of Drive',
     description: 'A tribute to the golden era of BMW driving culture.',
-    images: ['/bmw-e36.jpg'],
+    images: ['/images/bmw-e36.png'],
   },
 };
 ```
