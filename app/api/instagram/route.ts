@@ -40,7 +40,7 @@ export async function GET() {
             username: "@cultofdrive",
             content: truncatedCaption,
             imageUrl: post.media_url,
-            profilePic: "/profile.png",
+            profilePic: "/images/profile.png",
             timestamp: post.timestamp,
             like_count: post.like_count || 0,
             url: post.permalink,
