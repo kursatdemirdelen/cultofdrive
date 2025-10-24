@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/bmw-e36.jpg",
+        url: "/images/bmw-e36.png",
         width: 1200,
         height: 600,
         alt: "BMW E36 - Cult of Drive",
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     title: "Cult of Drive — 90s–2000s BMW Culture",
     description:
       "Experience the golden era of BMW. Pure driving machines, no compromises.",
-    images: ["/bmw-e36.jpg"],
+    images: ["/images/bmw-e36.png"],
   },
   robots: {
     index: true,

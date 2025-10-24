@@ -77,18 +77,37 @@ npm run lint
 ```
 cultofdrive/
 ├── app/
-│   ├── layout.tsx       # Root layout + metadata
-│   ├── page.tsx         # Landing page
-│   ├── globals.css      # Global styles
-│
+│   ├── api/subscribe/route.ts # Supabase waitlist endpoint
+│   ├── components/            # UI composition (hero, drivers garage, social feed)
+│   ├── globals.css            # Global styles
+│   ├── layout.tsx             # Root layout + metadata
+│   └── page.tsx               # Landing page
 ├── public/
-│   ├── bmw-e36.jpg      # Hero image
-│
+│   └── images/                # Marketing imagery & profile assets
+├── utils/                     # Client helpers (e.g. supabase client)
 ├── tailwind.config.js
 ├── postcss.config.js
 ├── package.json
 └── README.md
 ```
+
+---
+
+## 🖼️ Media Assets (`public/images/`)
+
+| File | Format | Description |
+|------|--------|-------------|
+| `alpinwhite-e36.png` | PNG | Alpine White BMW E36 coupe angle shot |
+| `bmw-e36.png` | PNG | Primary hero image used for previews |
+| `dailye36-touring.png` | PNG | Daily-driven BMW E36 touring profile |
+| `e36-mike.png` | PNG | Enthusiast portrait with BMW E36 |
+| `e36-placeholder.png` | PNG | Placeholder asset for gallery slots |
+| `e36-whatsvanos.jpg` | JPG | Technical close-up featuring VANOS details |
+| `e46-knight.jpg` | JPG | BMW E46 night-time rolling shot |
+| `e46-yasin.png` | PNG | Owner spotlight portrait with BMW E46 |
+| `f3hmii-e39.png` | PNG | BMW E39 stance-focused profile |
+| `profile.png` | PNG | Default community avatar |
+| `technoviolet-e36.png` | PNG | Technoviolet BMW E36 coupe |
 
 ---
 
@@ -102,7 +121,7 @@ export const metadata = {
   openGraph: {
     title: 'Cult of Drive',
     description: 'A tribute to the golden era of BMW driving culture.',
-    images: ['/bmw-e36.jpg'],
+    images: ['/images/bmw-e36.png'],
   },
 };
 ```
@@ -117,6 +136,32 @@ This project includes a fully functional email subscription system:
 - **Email Form Component** with validation and error handling
 
 The email subscription is already integrated and ready to use!
+
+---
+
+## 📡 Data Services
+
+Cult of Drive exposes two API routes for loading social content into the site.
+
+### `/api/instagram`
+- Returns the latest Instagram media items in a normalized `{ posts: [] }` shape for the UI.
+- Requires a valid `INSTAGRAM_ACCESS_TOKEN`; refresh long-lived tokens every 60 days to avoid a `500` response with `{ "error": "Failed to fetch Instagram posts" }`.
+- Typical use:
+  ```ts
+  const res = await fetch('/api/instagram', { cache: 'no-store' })
+  if (!res.ok) throw new Error('Instagram feed unavailable')
+  ```
+
+### `/api/social-posts`
+- Reads curated entries from the Supabase `social_posts` table and accepts `POST` requests to add new rows.
+- Expected columns: `id uuid`, `username text`, `content text`, optional `image_url text`, `like_count int4 default 0`, `url text`, `created_at timestamptz default now()`.
+- `/api/subscribe` stores waitlist addresses in the `E-mail` table (`id uuid`, `e_mail text unique`, `created_at timestamptz`).
+- Error conventions: `400` for missing fields, `500` for Supabase errors.
+- Typical use:
+  ```ts
+  const res = await fetch('/api/social-posts')
+  const { posts } = await res.json()
+  ```
 
 ---
 
