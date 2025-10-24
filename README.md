@@ -181,10 +181,10 @@ vercel deploy
 
 ## 🧭 Roadmap
 
-- [x] Add backend integration for email waitlist  
-- [ ] Include Instagram / Twitter live feed  
-- [ ] Introduce "Driver's Garage" gallery  
-- [ ] Add multilingual support (EN/TR)  
+- [x] Add backend integration for email waitlist
+- [x] Include Instagram live feed
+- [x] Introduce "Driver's Garage" gallery
+- [ ] Add multilingual support (EN/TR)
 
 ---
 
