@@ -120,6 +120,32 @@ The email subscription is already integrated and ready to use!
 
 ---
 
+## 📡 Data Services
+
+Cult of Drive exposes two API routes for loading social content into the site.
+
+### `/api/instagram`
+- Returns the latest Instagram media items in a normalized `{ posts: [] }` shape for the UI.
+- Requires a valid `INSTAGRAM_ACCESS_TOKEN`; refresh long-lived tokens every 60 days to avoid a `500` response with `{ "error": "Failed to fetch Instagram posts" }`.
+- Typical use:
+  ```ts
+  const res = await fetch('/api/instagram', { cache: 'no-store' })
+  if (!res.ok) throw new Error('Instagram feed unavailable')
+  ```
+
+### `/api/social-posts`
+- Reads curated entries from the Supabase `social_posts` table and accepts `POST` requests to add new rows.
+- Expected columns: `id uuid`, `username text`, `content text`, optional `image_url text`, `like_count int4 default 0`, `url text`, `created_at timestamptz default now()`.
+- `/api/subscribe` stores waitlist addresses in the `E-mail` table (`id uuid`, `e_mail text unique`, `created_at timestamptz`).
+- Error conventions: `400` for missing fields, `500` for Supabase errors.
+- Typical use:
+  ```ts
+  const res = await fetch('/api/social-posts')
+  const { posts } = await res.json()
+  ```
+
+---
+
 ## 🚀 Deployment
 
 Deploy instantly with **[Vercel](https://vercel.com)**:
