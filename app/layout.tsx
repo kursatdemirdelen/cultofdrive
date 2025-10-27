@@ -34,8 +34,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: "/images/bmw-e36.png",
-        width: 1200,
-        height: 600,
+        width: 1024,
+        height: 640,
         alt: "BMW E36 - Cult of Drive",
       },
     ],
