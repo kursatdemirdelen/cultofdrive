@@ -13,7 +13,7 @@ import { useRouter } from "next/navigation";
 export default function MyGaragePage() {
   const [user, setUser] = useState<User | null>(null);
   const [checking, setChecking] = useState(true);
-  const { cars, loading, error } = useCars({ userId: user?.id, preferLocalFirst: false });
+  const { cars, loading, error } = useCars({ userId: user?.id, limit: 50 });
   const router = useRouter();
 
   useEffect(() => {

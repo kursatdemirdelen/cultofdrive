@@ -16,7 +16,7 @@ const fadeUp = {
 };
 
 export default function DriversGarage() {
-  const { cars, loading, error } = useCars({ preferLocalFirst: true });
+  const { cars, loading, error } = useCars({ limit: 9 });
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
 
   if (loading) {

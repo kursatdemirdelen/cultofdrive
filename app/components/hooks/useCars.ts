@@ -3,57 +3,60 @@
 import { useState, useEffect } from "react";
 import type { Car } from "../types/car.types";
 
-export function useCars(params?: { q?: string; owner?: string; tag?: string; userId?: string; preferLocalFirst?: boolean }) {
+type UseCarsParams = {
+  q?: string;
+  owner?: string;
+  tag?: string;
+  userId?: string;
+  limit?: number;
+};
+
+export function useCars(params?: UseCarsParams) {
   const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const load = async () => {
+      setLoading(true);
+      setError(null);
       try {
-        // If homepage wants local-first showcase, prefer local JSON and return
-        if (params?.preferLocalFirst) {
-          const res = await fetch("/data/cars.json");
-          if (!res.ok) throw new Error("Failed to fetch cars");
-          const data = await res.json();
-          setCars(data);
-          setLoading(false);
-          return;
-        }
-
-        // Default: try dynamic API first
         const qs = new URLSearchParams();
-        if (params?.q) qs.set('q', params.q);
-        if (params?.owner) qs.set('owner', params.owner);
-        if (params?.tag) qs.set('tag', params.tag);
-        if (params?.userId) qs.set('user_id', params.userId);
-        const apiRes = await fetch(`/api/cars${qs.toString() ? `?${qs.toString()}` : ''}`, { cache: "no-store" });
-        if (apiRes.ok) {
-          const { cars } = await apiRes.json();
-          setCars(cars);
-          setLoading(false);
-          return;
-        }
-      } catch (e) {
-        console.error("/api/cars error:", e);
-      }
+        if (params?.q) qs.set("q", params.q);
+        if (params?.owner) qs.set("owner", params.owner);
+        if (params?.tag) qs.set("tag", params.tag);
+        if (params?.userId) qs.set("user_id", params.userId);
+        if (params?.limit) qs.set("limit", String(params.limit));
 
-      // Fallback to static JSON
-      try {
-        const res = await fetch("/data/cars.json");
-        if (!res.ok) throw new Error("Failed to fetch cars");
-        const data = await res.json();
-        setCars(data);
-        setLoading(false);
+        const res = await fetch(`/api/cars${qs.toString() ? `?${qs.toString()}` : ""}`, {
+          cache: "no-store",
+          signal: controller.signal,
+        });
+
+        if (!res.ok) {
+          throw new Error("Failed to fetch cars");
+        }
+
+        const { cars } = await res.json();
+        setCars(cars);
       } catch (err) {
-        console.error(err);
+        if (controller.signal.aborted) return;
+        console.error("/api/cars error:", err);
+        setCars([]);
         setError("Failed to load cars");
-        setLoading(false);
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
     load();
-  }, [params?.q, params?.owner, params?.tag, params?.userId, params?.preferLocalFirst]);
+
+    return () => controller.abort();
+  }, [params?.q, params?.owner, params?.tag, params?.userId, params?.limit]);
 
   return { cars, loading, error };
 }
