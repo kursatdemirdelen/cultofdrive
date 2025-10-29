@@ -1,20 +1,36 @@
-import EmailForm from "./EmailForm";
+const highlights = [
+  {
+    title: "Owner stories",
+    body: "Every feature includes the car's backstory, setup, and the driver behind the wheel.",
+  },
+  {
+    title: "Verified specs",
+    body: "Engine builds, swap lists, and mod sheets pulled straight from the community.",
+  },
+  {
+    title: "Live reactions",
+    body: "Favorites and comments refresh the moment the community shows love.",
+  },
+];
 
 export default function CommunitySection() {
   return (
-    <section id="community" className="mt-2 text-center">
-      <span className="inline-block px-3 py-1.5 mb-6 text-xs text-white/70 rounded-md bg-carbon/40 border border-white/10">
-        Coming Soon
-      </span>
-      <h2 className="mb-4 text-3xl font-heading tracking-[0.05em] text-white/90">
-        Join the community
+    <section id="community" className="mt-12">
+      <h2 className="text-center text-2xl font-heading tracking-[0.08em] text-white/90">
+        What makes Cult of Drive different?
       </h2>
-      <p className="max-w-xl mx-auto mb-6 leading-relaxed text-white/60">
-        Be the first to know when we launch. No spam, unsubscribe anytime.
-      </p>
-
-      <div className="max-w-md mx-auto">
-        <EmailForm />
+      <div className="mt-6 grid gap-4 sm:grid-cols-3">
+        {highlights.map((item) => (
+          <div
+            key={item.title}
+            className="rounded-lg border border-white/10 bg-white/5 px-4 py-5 text-left"
+          >
+            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-white/45">
+              {item.title}
+            </p>
+            <p className="mt-2 text-sm text-white/70">{item.body}</p>
+          </div>
+        ))}
       </div>
     </section>
   );

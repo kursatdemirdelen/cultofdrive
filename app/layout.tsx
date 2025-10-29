@@ -4,11 +4,15 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import type { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/next";
+import TopBar from "@/app/components/nav/TopBar";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Cult of Drive — 90s–2000s BMW Culture",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+  ),
+  title: "Cult of Drive - 90s-2000s BMW Culture",
   description:
     "Experience the golden era of BMW. Pure driving machines, no compromises. Join the community for classic BMW enthusiasts.",
   keywords: [
@@ -25,7 +29,7 @@ export const metadata: Metadata = {
   creator: "Cult of Drive",
   publisher: "Cult of Drive",
   openGraph: {
-    title: "Cult of Drive — 90s–2000s BMW Culture",
+    title: "Cult of Drive - 90s-2000s BMW Culture",
     description:
       "Experience the golden era of BMW. Pure driving machines, no compromises.",
     siteName: "Cult of Drive",
@@ -42,7 +46,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cult of Drive — 90s–2000s BMW Culture",
+    title: "Cult of Drive - 90s-2000s BMW Culture",
     description:
       "Experience the golden era of BMW. Pure driving machines, no compromises.",
     images: ["/images/bmw-e36.png"],
@@ -59,7 +63,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: "your-google-verification-code", // Replace with actual verification code
+    google: "your-google-verification-code",
   },
 };
 
@@ -71,7 +75,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" className={inter.className}>
       <body>
-        {children}
+        <TopBar />
+        <main className="pt-8 md:pt-12">{children}</main>
         <SpeedInsights />
         <Analytics />
       </body>

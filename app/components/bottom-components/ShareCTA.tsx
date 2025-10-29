@@ -11,11 +11,17 @@ const ShareCTA: React.FC = () => {
       </h3>
       <div className="mx-auto mb-4 h-[2px] w-[60px] bg-gradient-to-r from-[#00a0ff] via-[#0055ff] to-[#c40000] opacity-70" />
       <p className="mb-6 text-center text-white/60">
-        Want to showcase your BMW? This feature is coming soon — follow us on
-        Instagram to stay updated.
+        Want to showcase your BMW? Add it to your garage or follow us for updates.
       </p>
 
-      <div className="text-center">
+      <div className="flex items-center justify-center gap-3">
+        <a
+          href="/garage/add"
+          className="inline-flex items-center gap-2 px-6 py-2 text-sm font-medium transition-all duration-200 border rounded-md bg-white/15 border-white/15 text-white/90 hover:bg-white/25"
+        >
+          Add Your Car
+          <ChevronRight className="w-4 h-4 text-white/80 transition-transform duration-200 group-hover:translate-x-0.5" />
+        </a>
         <a
           href="https://instagram.com/cultofdrive"
           target="_blank"
@@ -32,3 +38,4 @@ const ShareCTA: React.FC = () => {
 };
 
 export default ShareCTA;
+

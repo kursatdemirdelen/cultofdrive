@@ -2,8 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    // İzin verilen ana domain(ler)
-    domains: ["scontent.cdninstagram.com"],
+    domains: ["scontent.cdninstagram.com", "lpibrmefgocqwaoxawaq.supabase.co"],
 
     formats: ["image/avif", "image/webp"],
     deviceSizes: [320, 480, 640, 768, 1024, 1280, 1536, 1920],
@@ -13,17 +12,10 @@ const nextConfig: NextConfig = {
     contentSecurityPolicy:
       "default-src 'self'; script-src 'self' 'unsafe-inline'; img-src 'self' data: https:; sandbox;",
 
-    // Instagram CDN pattern'leri
-     remotePatterns: [
+    remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'instagram.fada2-2.fna.fbcdn.net',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'scontent-*.fbcdn.net',
+        hostname: '*.cdninstagram.com',
         port: '',
         pathname: '/**',
       },
@@ -33,13 +25,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
-       {
+      {
         protocol: 'https',
-        hostname: 'scontent-*.cdninstagram.com',
+        hostname: '*.supabase.co',
         port: '',
-        pathname: '/**',
+        pathname: '/storage/v1/object/**',
       }
-
     ],
   },
 

@@ -45,7 +45,7 @@ export default function CarModal({ car, onClose }: CarModalProps) {
               className="absolute p-2 transition rounded-full top-4 right-4 bg-white/10 text-white/70 hover:bg-white/20 hover:text-white"
               aria-label="Close modal"
             >
-              ✕
+              ×
             </button>
           </div>
 
@@ -70,3 +70,4 @@ export default function CarModal({ car, onClose }: CarModalProps) {
     </AnimatePresence>
   );
 }
+

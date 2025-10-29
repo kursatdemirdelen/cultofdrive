@@ -3,15 +3,26 @@ import { supabase } from '@/utils/supabase'
 
 export async function GET() {
   try {
-    const { data: posts, error } = await supabase
+    const { data, error } = await supabase
       .from('social_posts')
-      .select('*')
+      .select('id, username, content, image_url, like_count, url, created_at')
       .order('created_at', { ascending: false })
       .limit(6)
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
+
+    const posts = (data || []).map((row: any) => ({
+      id: row.id,
+      username: row.username,
+      content: row.content,
+      imageUrl: row.image_url || '',
+      like_count: row.like_count ?? 0,
+      url: row.url || '',
+      timestamp: row.created_at,
+      profilePic: '/images/profile.png',
+    }))
 
     return NextResponse.json({ posts })
   } catch (error) {
