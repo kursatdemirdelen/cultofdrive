@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { supabase } from '@/utils/supabase'
+import { isLocalFallbackEnabled, getLocalCarById } from '@/utils/localFallback'
 
 type DbCar = {
   id: string
@@ -26,7 +27,17 @@ export async function GET(
       .maybeSingle()
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-    if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    if (!data) {
+      if (isLocalFallbackEnabled()) {
+        try {
+          const fallback = await getLocalCarById(id)
+          if (fallback) {
+            return NextResponse.json({ car: fallback })
+          }
+        } catch {}
+      }
+      return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    }
 
     const row = data as DbCar
     const { data: pub } = row.image_url
@@ -37,7 +48,11 @@ export async function GET(
       ? row.specs.map((s: any) => {
           if (typeof s === 'string') return s
           if (s && typeof s === 'object' && 'key' in s && 'value' in s) return `${s.key}: ${s.value}`
-          try { return JSON.stringify(s) } catch { return String(s) }
+          try {
+            return JSON.stringify(s)
+          } catch {
+            return String(s)
+          }
         })
       : []
 
@@ -55,6 +70,16 @@ export async function GET(
 
     return NextResponse.json({ car })
   } catch (err) {
+    if (isLocalFallbackEnabled()) {
+      try {
+        const { id } = await (ctx as any).params
+        const fallback = await getLocalCarById(id)
+        if (fallback) {
+          return NextResponse.json({ car: fallback })
+        }
+      } catch {}
+    }
     return NextResponse.json({ error: 'Failed to fetch car' }, { status: 500 })
   }
 }
+
