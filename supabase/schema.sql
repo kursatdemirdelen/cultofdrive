@@ -13,6 +13,7 @@ create table if not exists public.cars (
   description text,
   specs jsonb not null default '[]'::jsonb,
   tags text[] not null default '{}',
+  is_featured boolean default false,
   created_at timestamptz not null default now()
 );
 
@@ -199,3 +200,4 @@ create index if not exists idx_car_comments_car_id_created_at on public.car_comm
 
 -- Social posts
 create index if not exists idx_social_posts_created_at on public.social_posts (created_at desc);
+
