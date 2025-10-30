@@ -7,4 +7,5 @@ export interface Car {
   imageUrl: string;
   specs: string[];
   tags: string[];
+  isFeatured?: boolean;
 }
