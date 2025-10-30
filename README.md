@@ -1,29 +1,28 @@
 # 🚗 Cult of Drive
 
-> A curated digital garage for 90s–2000s BMW icons. Authentic builds, lived-in stories, and a community that still feels the road.
+> A curated digital garage celebrating 90s-2000s BMW icons. Share authentic builds, connect with enthusiasts, and preserve the stories that make these cars legendary.
 
 ![BMW E36](public/images/bmw-e36.png)
 
 ## ✨ Features
 
 ### Core Features
-- **Discover**: Browse and search BMW builds with advanced filtering
+- **Browse & Discover**: Curated BMW builds with advanced search and filtering
 - **My Garage**: Personal collection management for authenticated users
-- **Car Details**: Comprehensive car pages with specs, images, and stories
-- **User Profiles**: Driver pages showcasing their builds
-- **Admin Dashboard**: Complete car management with moderation tools
+- **Car Details**: Comprehensive pages with specs, images, and owner stories
+- **User Profiles**: Driver pages showcasing their builds and history
 
 ### Social Features
 - **Favorites**: Save and track your favorite builds
-- **Comments**: Engage with the community
-- **Real-time Notifications**: Get notified of new favorites and comments
-- **Share**: Share builds on social media
+- **Comments**: Engage with the community on car listings
+- **Notifications**: Real-time updates for favorites and comments
+- **Social Feed**: Community posts and updates
 
-### Advanced Features
+### Admin & Advanced
+- **Admin Dashboard**: Complete car management with analytics
+- **Marketplace**: Buy and sell BMW builds with inquiry system
+- **Moderation**: Content reporting and review system
 - **Analytics**: View tracking and engagement metrics
-- **Moderation**: Report system with admin review panel
-- **Marketplace**: Buy and sell BMW builds
-- **Image Gallery**: Multi-image support with lightbox
 
 ## 🛠️ Tech Stack
 
@@ -49,11 +48,11 @@
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/yourusername/cultofdrive.git
+git clone https://github.com/kursatdemirdelen/cultofdrive.git
 cd cultofdrive
 ```
 
-For detailed setup instructions, see [SETUP.md](SETUP.md)
+
 
 2. **Install dependencies**
 ```bash
@@ -70,9 +69,10 @@ Edit `.env.local` with your Supabase credentials:
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
 SUPABASE_URL=your_supabase_url
-SUPABASE_KEY=your_service_role_key
+SUPABASE_KEY=your_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=true
 ```
 
 4. **Set up the database**
@@ -97,18 +97,18 @@ Visit [http://localhost:3000](http://localhost:3000)
 
 ```
 cultofdrive/
-├── app/                      # Next.js App Router
-│   ├── admin/               # Admin dashboard
-│   ├── api/                 # API routes
-│   ├── cars/[id]/          # Car detail pages
-│   ├── components/          # Shared components
-│   ├── driver/[owner]/     # User profile pages
-│   ├── garage/             # Garage pages
-│   ├── marketplace/        # Marketplace pages
-│   └── page.tsx            # Homepage
-├── public/                  # Static assets
-├── supabase/               # Database schemas
-├── utils/                  # Utility functions
+├── app/
+│   ├── admin/              # Admin dashboard
+│   ├── api/                # API routes
+│   ├── cars/[id]/         # Car detail pages
+│   ├── components/         # Shared components
+│   ├── driver/[owner]/    # User profile pages
+│   ├── garage/            # Garage management
+│   ├── marketplace/       # Marketplace features
+│   └── page.tsx           # Homepage
+├── public/                 # Static assets
+├── supabase/              # Database schemas
+├── utils/                 # Utility functions
 └── README.md
 ```
 
@@ -125,7 +125,7 @@ The project uses 11 main tables:
 - `marketplace_listings` - Marketplace listings
 - `marketplace_inquiries` - Buyer inquiries
 - `social_posts` - Social feed posts
-- `email_subscriptions` - Email subscriptions
+- `email_subscriptions` - Newsletter subscriptions
 
 ## 🔑 Environment Variables
 
@@ -136,85 +136,37 @@ The project uses 11 main tables:
 | `SUPABASE_URL` | Server-side Supabase URL | Yes |
 | `SUPABASE_KEY` | Server-side Supabase key | Yes |
 | `SUPABASE_SERVICE_ROLE_KEY` | Admin operations key | Yes |
-| `NEXT_PUBLIC_SITE_URL` | Application URL | Yes |
+| `NEXT_PUBLIC_SITE_URL` | Application base URL | Yes |
 | `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED` | Enable Google OAuth | No |
 | `SEED_SECRET` | Development seed data key | No |
 
-## 📜 Available Scripts
+
+
+
+
+## 🛠️ Development
 
 ```bash
-npm run dev          # Start development server
-npm run build        # Create production build
-npm run start        # Start production server
-npm run lint         # Run ESLint
-npm run type-check   # TypeScript type checking
+npm run dev          # Start dev server
+npm run build        # Production build
+npm run type-check   # Check types
 ```
 
-## 🎨 Key Features Explained
 
-### Admin Dashboard
-- Car CRUD operations
-- Featured car management
-- Moderation queue
-- Analytics overview
 
-### Discover Page
-- Advanced search and filtering
-- Grid/List view toggle
-- Sort by newest, oldest, or model
-- Featured-only filter
 
-### Marketplace
-- Create listings for your cars
-- Browse active listings
-- Contact sellers directly
-- View tracking
-
-### Notifications
-- Real-time updates via Supabase subscriptions
-- In-app notification center
-- Unread badge counter
-- Mark as read functionality
-
-## 🔒 Security
-
-- Row Level Security (RLS) policies on all tables
-- Admin key authentication for sensitive operations
-- Input validation and sanitization
-- Content moderation system
 
 ## 🚢 Deployment
 
-### Deploy to Vercel
-
-1. Push your code to GitHub
-2. Import project in Vercel
-3. Add environment variables
-4. Deploy
-
-### Post-Deployment
-- Configure OAuth providers in Supabase
-- Set up custom domain (optional)
-- Enable Vercel Analytics
+Deploy to Vercel in minutes. Connect your GitHub repo, add environment variables, and you're live.
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+Contributions welcome! Fork, create a feature branch, and submit a PR.
 
-## 📝 License
+## 🔐 Admin
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- BMW community for inspiration and passion
-- [Next.js](https://nextjs.org/) team for the amazing framework
-- [Supabase](https://supabase.com/) for the backend infrastructure
-- [Vercel](https://vercel.com/) for hosting and deployment
-
-## 📧 Contact
-
-For questions or feedback, please open an issue or reach out to the maintainers.
+Visit `/admin` and enter your Supabase service role key to manage content.
 
 ---
 

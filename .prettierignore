@@ -6,3 +6,6 @@ build
 *.log
 .env*
 public
+.github
+supabase
+*.tsbuildinfo
