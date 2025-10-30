@@ -4,17 +4,20 @@ import { useState, useMemo, FormEvent, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { supabaseBrowser } from "@/utils/supabase-browser";
+import { Upload, X, Plus, ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { TagInput } from "@/app/components/form/TagInput";
+import { SpecInput } from "@/app/components/form/SpecInput";
 
 type Spec = { key: string; value: string };
 
 export default function AddCarPage() {
   const [model, setModel] = useState("");
-  const [year, setYear] = useState<string>("");
+  const [year, setYear] = useState("");
   const [owner, setOwner] = useState("");
-  const [username, setUsername] = useState("");
   const [description, setDescription] = useState("");
   const [specs, setSpecs] = useState<Spec[]>([{ key: "Engine", value: "" }]);
-  const [tags, setTags] = useState<string>("");
+  const [tags, setTags] = useState<string[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -22,6 +25,7 @@ export default function AddCarPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
 
+  const router = useRouter();
   const previewUrl = useMemo(() => (file ? URL.createObjectURL(file) : null), [file]);
 
   useEffect(() => {
@@ -36,17 +40,18 @@ export default function AddCarPage() {
       setUserId(session?.user?.id ?? null);
       setCheckingAuth(false);
     });
-    return () => { sub.subscription.unsubscribe(); mounted = false };
+    return () => {
+      sub.subscription.unsubscribe();
+      mounted = false;
+    };
   }, []);
-
-  const handleAddSpec = () => setSpecs((s) => [...s, { key: "", value: "" }]);
-  const handleRemoveSpec = (idx: number) => setSpecs((s) => s.filter((_, i) => i !== idx));
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
     setMessage(null);
+
     try {
       const fd = new FormData();
       if (file) fd.set("image", file);
@@ -54,28 +59,23 @@ export default function AddCarPage() {
       if (year) fd.set("year", year);
       if (owner) fd.set("owner", owner);
       fd.set("description", description);
-      const cleanedSpecs = specs.filter((s) => s.key || s.value);
+      
+      const cleanedSpecs = specs.filter(s => s.key || s.value);
       fd.set("specs", JSON.stringify(cleanedSpecs));
-      const tagArr = tags
-        .split(",")
-        .map((t) => t.trim())
-        .filter(Boolean);
-      fd.set("tags", JSON.stringify(tagArr));
-      if (username) fd.set("username", username);
+      fd.set("tags", JSON.stringify(tags));
+      
       if (userId) fd.set("user_id", userId);
 
       const res = await fetch("/api/upload", { method: "POST", body: fd });
       const data = await res.json();
+      
       if (!res.ok) throw new Error(data?.error || "Failed to upload");
+      
       setMessage("Your car has been added to the garage!");
-      setModel("");
-      setYear("");
-      setOwner("");
-      setUsername("");
-      setDescription("");
-      setSpecs([{ key: "Engine", value: "" }]);
-      setTags("");
-      setFile(null);
+      
+      setTimeout(() => {
+        router.push("/garage/mine");
+      }, 1500);
     } catch (err: any) {
       setError(err?.message || "Unexpected error");
     } finally {
@@ -85,169 +85,191 @@ export default function AddCarPage() {
 
   if (checkingAuth) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center bg-gradient-to-b from-gray-900 to-black text-white/70">
-        Checking access...
+      <div className="flex min-h-[60vh] items-center justify-center bg-gradient-to-br from-black via-slate-900 to-slate-950">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-white border-t-transparent" />
       </div>
     );
   }
 
   if (!userId) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4 bg-gradient-to-b from-gray-900 to-black text-center text-white/80 px-4">
-        <h1 className="text-3xl font-heading tracking-[0.1em]">Driver&apos;s Garage</h1>
-        <p className="max-w-md text-white/60">Sign in to share your BMW build, specs, and story with the community.</p>
-        <Link href="/auth" className="btn-motorsport-primary">Sign in to add your car</Link>
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 bg-gradient-to-br from-black via-slate-900 to-slate-950 px-4 text-center">
+        <h1 className="font-heading text-3xl tracking-[0.12em] text-white">ADD YOUR CAR</h1>
+        <p className="max-w-md text-white/60">
+          Sign in to share your BMW build with the community
+        </p>
+        <Link
+          href="/auth"
+          className="rounded-lg bg-white/10 px-6 py-3 font-medium text-white transition hover:bg-white/20"
+        >
+          Sign in
+        </Link>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black py-10 px-4">
-      <div className="max-w-3xl mx-auto border border-white/10 bg-black/40 backdrop-blur-lg rounded-xl p-6 md:p-8">
-        <h1 className="text-3xl md:text-4xl font-heading tracking-[0.12em] text-white text-center mb-2">
-          Add Your Car to the Garage
-        </h1>
-        <div className="mx-auto mb-8 h-[3px] w-[180px] bg-gradient-to-r from-[#00a0ff] via-[#0055ff] to-[#c40000] rounded-full opacity-90" />
+    <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-slate-950 px-4 py-12">
+      <div className="mx-auto max-w-3xl">
+        <Link
+          href="/garage/mine"
+          className="mb-6 inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm text-white/80 backdrop-blur transition hover:bg-white/10"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to My Garage
+        </Link>
 
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Step 1: Basic Info */}
-          <section>
-            <h2 className="text-xl text-white/90 mb-4">Basic Information</h2>
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm text-white/70 mb-1">Model</label>
-                <input
-                  className="w-full px-3 py-2 rounded-md bg-white/10 border border-white/15 text-white placeholder-white/50"
-                  placeholder="BMW E36 328i Coupe"
-                  value={model}
-                  onChange={(e) => setModel(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-white/70 mb-1">Year</label>
-                <input
-                  type="number"
-                  className="w-full px-3 py-2 rounded-md bg-white/10 border border-white/15 text-white placeholder-white/50"
-                  placeholder="1997"
-                  value={year}
-                  onChange={(e) => setYear(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-white/70 mb-1">Owner</label>
-                <input
-                  className="w-full px-3 py-2 rounded-md bg-white/10 border border-white/15 text-white placeholder-white/50"
-                  placeholder="John Doe"
-                  value={owner}
-                  onChange={(e) => setOwner(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-white/70 mb-1">Username/Handle</label>
-                <input
-                  className="w-full px-3 py-2 rounded-md bg-white/10 border border-white/15 text-white placeholder-white/50"
-                  placeholder="@johndoe"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                />
-              </div>
-            </div>
-          </section>
+        <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur md:p-8">
+          <h1 className="mb-2 text-center font-heading text-3xl tracking-[0.12em] text-white">
+            ADD YOUR CAR
+          </h1>
+          <p className="mb-8 text-center text-sm text-white/60">
+            Share your BMW build with the community
+          </p>
 
-          {/* Step 2: Upload */}
-          <section>
-            <h2 className="text-xl text-white/90 mb-4">Photos</h2>
-            <div className="grid gap-4 md:grid-cols-2 items-start">
-              <label className="flex items-center justify-center h-40 rounded-md border border-dashed border-white/20 bg-white/5 text-white/70 hover:bg-white/10 cursor-pointer">
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => setFile(e.target.files?.[0] || null)}
-                />
-                {file ? "Change Photo" : "Click to upload main photo"}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Image Upload */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-white/80">
+                Car Photo *
               </label>
-              {previewUrl && (
-                <div className="relative h-40 rounded-md overflow-hidden border border-white/10">
-                  <Image src={previewUrl} alt="Preview" fill className="object-cover" />
+              {previewUrl ? (
+                <div className="relative aspect-video overflow-hidden rounded-lg">
+                  <Image src={previewUrl!} alt="Preview" fill className="object-cover" sizes="800px" unoptimized />
+                  <button
+                    type="button"
+                    onClick={() => setFile(null)}
+                    className="absolute right-3 top-3 rounded-full bg-black/60 p-2 text-white backdrop-blur transition hover:bg-black/80"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
                 </div>
+              ) : (
+                <label className="flex h-48 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-white/20 bg-white/5 transition hover:border-white/40 hover:bg-white/8">
+                  <Upload className="mb-2 h-8 w-8 text-white/40" />
+                  <span className="text-sm text-white/60">Click to upload image</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => setFile(e.target.files?.[0] || null)}
+                    required
+                  />
+                </label>
               )}
             </div>
-          </section>
 
-          {/* Step 3: Details */}
-          <section>
-            <h2 className="text-xl text-white/90 mb-4">Details</h2>
-            <div className="grid gap-4">
+            {/* Basic Info */}
+            <div className="grid gap-4 md:grid-cols-2">
               <div>
-                <label className="block text-sm text-white/70 mb-1">Story / Description</label>
-                <textarea
-                  className="w-full px-3 py-2 rounded-md bg-white/10 border border-white/15 text-white placeholder-white/50 min-h-[120px]"
-                  placeholder="Tell us about your car..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm text-white/70">Specifications</label>
-                  <button type="button" onClick={handleAddSpec} className="text-sm text-white/70 hover:text-white">+ Add</button>
-                </div>
-                <div className="space-y-2">
-                  {specs.map((s, idx) => (
-                    <div key={idx} className="grid grid-cols-5 gap-2">
-                      <input
-                        className="col-span-2 px-3 py-2 rounded-md bg-white/10 border border-white/15 text-white placeholder-white/50"
-                        placeholder="Key (e.g., Engine)"
-                        value={s.key}
-                        onChange={(e) => {
-                          const v = e.target.value; setSpecs((arr) => arr.map((it, i) => i === idx ? { ...it, key: v } : it));
-                        }}
-                      />
-                      <input
-                        className="col-span-3 px-3 py-2 rounded-md bg-white/10 border border-white/15 text-white placeholder-white/50"
-                        placeholder="Value (e.g., S54B32)"
-                        value={s.value}
-                        onChange={(e) => {
-                          const v = e.target.value; setSpecs((arr) => arr.map((it, i) => i === idx ? { ...it, value: v } : it));
-                        }}
-                      />
-                      <button type="button" onClick={() => handleRemoveSpec(idx)} className="text-sm text-white/60 hover:text-white">Remove</button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm text-white/70 mb-1">Tags</label>
+                <label className="mb-2 block text-sm font-medium text-white/80">Model *</label>
                 <input
-                  className="w-full px-3 py-2 rounded-md bg-white/10 border border-white/15 text-white placeholder-white/50"
-                  placeholder="#classic, #E36, #manual"
-                  value={tags}
-                  onChange={(e) => setTags(e.target.value)}
+                  type="text"
+                  value={model}
+                  onChange={(e) => setModel(e.target.value)}
+                  placeholder="BMW E36 M3"
+                  required
+                  minLength={2}
+                  maxLength={100}
+                  className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-2.5 text-white placeholder-white/40 transition focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
                 />
-                <p className="text-xs text-white/50 mt-1">Separate with commas</p>
+              </div>
+              <div>
+                <label className="mb-2 block text-sm font-medium text-white/80">Year</label>
+                <input
+                  type="number"
+                  value={year}
+                  onChange={(e) => setYear(e.target.value)}
+                  placeholder="1997"
+                  min="1990"
+                  max={new Date().getFullYear()}
+                  className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-2.5 text-white placeholder-white/40 transition focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
+                />
               </div>
             </div>
-          </section>
 
-          <div className="flex items-center justify-between gap-4">
-            <div className="text-sm">
-              {error && <p className="text-red-300">{error}</p>}
-              {message && <p className="text-emerald-300">{message}</p>}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-white/80">Owner</label>
+              <input
+                type="text"
+                value={owner}
+                onChange={(e) => setOwner(e.target.value)}
+                placeholder="Your name"
+                className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-2.5 text-white placeholder-white/40 transition focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
+              />
             </div>
-            <button
-              type="submit"
-              disabled={submitting || !userId}
-              className="btn-motorsport-primary disabled:opacity-60"
-            >
-              {submitting ? "Adding..." : userId ? "Add to Garage" : "Sign in to add"}
-            </button>
-          </div>
-        </form>
+
+            {/* Description */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-white/80">
+                Story / Description *
+                <span className="ml-2 text-xs text-white/50">({description.length}/2000)</span>
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Tell us about your car, modifications, and what makes it special..."
+                required
+                maxLength={2000}
+                rows={5}
+                className="w-full resize-none rounded-lg border border-white/20 bg-white/5 px-4 py-2.5 text-white placeholder-white/40 transition focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
+              />
+            </div>
+
+            {/* Specs */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-white/80">
+                Specifications
+              </label>
+              <SpecInput specs={specs} onChange={setSpecs} disabled={submitting} />
+            </div>
+
+            {/* Tags */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-white/80">
+                Tags
+              </label>
+              <TagInput 
+                tags={tags} 
+                onChange={setTags} 
+                placeholder="e.g., e36, m3, manual" 
+                disabled={submitting}
+              />
+            </div>
+
+            {/* Messages */}
+            {error && (
+              <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-red-200">
+                {error}
+              </div>
+            )}
+
+            {message && (
+              <div className="rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3 text-green-200">
+                {message}
+              </div>
+            )}
+
+            {/* Submit */}
+            <div className="flex gap-3">
+              <button
+                type="submit"
+                disabled={submitting || !model || model.length < 2 || description.length > 2000}
+                className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-white/10 px-6 py-3 font-medium text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-50"
+                title={!model || model.length < 2 ? 'Model is required (min 2 characters)' : description.length > 2000 ? 'Description is too long' : ''}
+              >
+                <Plus className="h-5 w-5" />
+                {submitting ? "Adding..." : "Add to Garage"}
+              </button>
+              <Link
+                href="/garage/mine"
+                className="rounded-lg border border-white/20 px-6 py-3 font-medium text-white/80 transition hover:bg-white/5"
+              >
+                Cancel
+              </Link>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

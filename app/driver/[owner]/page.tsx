@@ -1,57 +1,106 @@
-async function getCarsByOwner(owner: string) {
-  const res = await fetch(`/api/cars?owner=${encodeURIComponent(owner)}`, { cache: "no-store" });
-  if (!res.ok) throw new Error("Failed to load");
+import { notFound } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import { Car, Calendar } from "lucide-react";
+import type { Metadata } from "next";
+
+async function getDriverCars(owner: string) {
+  const base = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const res = await fetch(`${base}/api/cars?owner=${encodeURIComponent(owner)}&limit=50`, { 
+    cache: "no-store" 
+  });
+  if (!res.ok) return { cars: [] };
   return res.json();
 }
 
-export default async function DriverGaragePage({ params }: { params: Promise<{ owner: string }> }) {
-  const { owner: rawOwner } = await params;
-  const owner = decodeURIComponent(rawOwner);
-  const { cars } = await getCarsByOwner(owner);
+export default async function DriverPage({ params }: { params: Promise<{ owner: string }> }) {
+  const { owner } = await params;
+  const decodedOwner = decodeURIComponent(owner);
+  const { cars } = await getDriverCars(decodedOwner);
+
+  if (!cars || cars.length === 0) {
+    notFound();
+  }
+
+  const totalCars = cars.length;
+  const featuredCars = cars.filter((c: any) => c.isFeatured).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black px-4 py-10">
+    <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-slate-950 px-4 py-12">
       <div className="mx-auto max-w-6xl">
-        <header className="mb-8">
-          <h1 className="text-3xl font-heading tracking-[0.1em] text-white md:text-4xl">
-            {owner}&apos;s Garage
-          </h1>
-          <p className="text-white/70">Cars added by this driver</p>
-        </header>
+        {/* Header */}
+        <div className="mb-8 rounded-xl border border-white/10 bg-white/5 p-8 backdrop-blur">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="mb-2 text-xs uppercase tracking-[0.3em] text-white/50">Driver Profile</p>
+              <h1 className="mb-4 font-heading text-4xl tracking-[0.12em] text-white">
+                {decodedOwner}
+              </h1>
+              <div className="flex flex-wrap gap-6 text-sm text-white/70">
+                <div className="flex items-center gap-2">
+                  <Car className="h-4 w-4" />
+                  {totalCars} {totalCars === 1 ? "Build" : "Builds"}
+                </div>
+                {featuredCars > 0 && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-yellow-400">★</span>
+                    {featuredCars} Featured
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
 
-        {cars.length === 0 ? (
-          <p className="text-white/70">No cars yet.</p>
-        ) : (
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        {/* Cars Grid */}
+        <div>
+          <h2 className="mb-6 text-xl font-semibold text-white">All Builds</h2>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {cars.map((car: any) => (
-              <a
+              <Link
                 key={car.id}
                 href={`/cars/${car.id}`}
-                className="cursor-pointer overflow-hidden rounded-lg border border-white/5 bg-carbon/40 transition-colors hover:bg-carbon/50"
+                className="group overflow-hidden rounded-xl border border-white/10 bg-white/5 backdrop-blur transition hover:border-white/20"
               >
-                <div className="relative h-56">
-                  {car.imageUrl && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={car.imageUrl} alt={car.model} className="h-full w-full object-cover" />
+                <div className="relative aspect-video overflow-hidden">
+                  <Image
+                    src={car.imageUrl.startsWith('public/') ? `/${car.imageUrl.replace('public/', '')}` : car.imageUrl}
+                    alt={car.model}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
+                  {car.isFeatured && (
+                    <div className="absolute right-3 top-3 rounded-full bg-black/60 px-2 py-1 backdrop-blur">
+                      <span className="text-xs text-yellow-400">★ Featured</span>
+                    </div>
                   )}
                 </div>
-                <div className="p-5">
-                  <h3 className="mb-1 text-xl font-medium text-white/90">{car.model}</h3>
+                <div className="p-4">
+                  <h3 className="mb-1 font-medium text-white">{car.model}</h3>
                   <div className="flex items-center gap-2 text-sm text-white/60">
                     {car.year && (
                       <>
-                        <span>{car.year}</span>
-                        <span className="inline-block h-1 w-1 rounded-full bg-white/40" aria-hidden />
+                        <Calendar className="h-3.5 w-3.5" />
+                        {car.year}
                       </>
                     )}
-                    <span>{car.owner}</span>
                   </div>
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ owner: string }> }): Promise<Metadata> {
+  const { owner } = await params;
+  const decodedOwner = decodeURIComponent(owner);
+  return {
+    title: `${decodedOwner}'s Garage | Cult of Drive`,
+    description: `Browse ${decodedOwner}'s BMW builds and collection on Cult of Drive.`,
+  };
 }
