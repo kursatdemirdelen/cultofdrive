@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { getAdminSupabaseClient } from "@/utils/admin-supabase";
 
-const supabaseUrl = process.env.SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+export const runtime = 'nodejs';
 
 function assertAdminKey(req: NextRequest) {
   const adminKey = req.headers.get("x-admin-key");
@@ -19,6 +17,7 @@ export async function PATCH(
 ) {
   try {
     assertAdminKey(req);
+    const supabase = getAdminSupabaseClient();
     const { id } = await params;
     const body = await req.json();
 
@@ -44,6 +43,7 @@ export async function DELETE(
 ) {
   try {
     assertAdminKey(req);
+    const supabase = getAdminSupabaseClient();
     const { id } = await params;
 
     const { error } = await supabase

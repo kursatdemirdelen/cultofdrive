@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { getAdminSupabaseClient } from "@/utils/admin-supabase";
 
-const supabaseUrl = process.env.SUPABASE_URL!;
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-const supabase = createClient(supabaseUrl, supabaseKey);
+export const runtime = 'nodejs';
 
 function assertAdminKey(req: NextRequest) {
   const adminKey = req.headers.get("x-admin-key");
@@ -16,6 +14,7 @@ function assertAdminKey(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     assertAdminKey(req);
+    const supabase = getAdminSupabaseClient();
 
     const { data: views } = await supabase
       .from("car_views")
