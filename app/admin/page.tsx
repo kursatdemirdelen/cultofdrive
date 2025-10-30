@@ -1,237 +1,490 @@
-"use client"
+"use client";
 
-import { useEffect, useMemo, useState } from "react"
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
+import type { CarFormState, AdminCar } from "./types";
+import { AdminHeader } from "./components/AdminHeader";
+import { AdminAuthSection } from "./components/AdminAuthSection";
+import { CarList } from "./components/CarList";
+import { CarForm } from "./components/CarForm";
+import { LockedState } from "./components/LockedState";
+import { HistoryNote } from "./components/HistoryNote";
+import { AdminDashboard } from "./components/AdminDashboard";
+import { Toast } from "./components/Toast";
+import { ConfirmDialog } from "./components/ConfirmDialog";
+import { ModerationPanel } from "./components/ModerationPanel";
+import { MarketplacePanel } from "./components/MarketplacePanel";
+import { UsersPanel } from "./components/UsersPanel";
+import { AnalyticsPanel } from "./components/AnalyticsPanel";
+import { AdminTabs } from "./components/AdminTabs";
 
-type Resource = "cars" | "social-posts"
+type UploadResponse = {
+  path: string;
+  publicUrl: string;
+};
 
-type StatusResponse = {
-  fallbackEnabled: boolean
-  local: {
-    cars: number
-    socialPosts: number
-  }
-  timestamp: string
-}
+const EMPTY_FORM: CarFormState = {
+  model: "",
+  year: "",
+  owner: "",
+  description: "",
+  tags: "",
+  specs: "",
+  imageUrl: "",
+  isFeatured: false,
+};
 
-type SyncResult = {
-  message: string
-  synced?: number
-  upserted?: number
-  inserted?: number
-}
+const STORAGE_BASE = process.env.NEXT_PUBLIC_SUPABASE_URL
+  ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/garage/`
+  : "";
 
-const RESOURCE_LABELS: Record<Resource, string> = {
-  cars: "Cars",
-  "social-posts": "Social Posts",
-}
+const resolveImageUrl = (path?: string | null) => {
+  if (!path) return "";
+  if (path.startsWith("http")) return path;
+  if (!STORAGE_BASE) return path;
+  return `${STORAGE_BASE}${path.replace(/^\/+/, "")}`;
+};
 
-export default function AdminDashboard() {
-  const [adminKey, setAdminKey] = useState("")
-  const [status, setStatus] = useState<StatusResponse | null>(null)
-  const [syncing, setSyncing] = useState<Resource | null>(null)
-  const [loadingResource, setLoadingResource] = useState<Resource | null>(null)
-  const [syncResult, setSyncResult] = useState<SyncResult | null>(null)
-  const [error, setError] = useState<string>("")
-  const [localData, setLocalData] = useState<Record<Resource, any[]>>({ cars: [], "social-posts": [] })
+export default function AdminPage() {
+  const [adminKey, setAdminKey] = useState("");
+  const [connected, setConnected] = useState(false);
+  const [activeTab, setActiveTab] = useState<"dashboard" | "cars" | "marketplace" | "users" | "analytics" | "moderation">("dashboard");
+  const [cars, setCars] = useState<AdminCar[]>([]);
+  const [search, setSearch] = useState("");
+  const [form, setForm] = useState<CarFormState>(EMPTY_FORM);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState("");
+
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; carId: string; carModel: string }>({ 
+    isOpen: false, 
+    carId: "", 
+    carModel: "" 
+  });
 
   useEffect(() => {
-    if (typeof window === "undefined") return
-    const stored = window.localStorage.getItem("cod-admin-key")
-    if (stored) {
-      setAdminKey(stored)
-    }
-  }, [])
+    if (typeof window === "undefined") return;
+    const storedKey = window.localStorage.getItem("cod-admin-key");
+    if (storedKey) setAdminKey(storedKey);
+  }, []);
 
   useEffect(() => {
-    if (typeof window === "undefined") return
+    if (typeof window === "undefined") return;
     if (adminKey) {
-      window.localStorage.setItem("cod-admin-key", adminKey)
+      window.localStorage.setItem("cod-admin-key", adminKey);
     } else {
-      window.localStorage.removeItem("cod-admin-key")
+      window.localStorage.removeItem("cod-admin-key");
     }
-  }, [adminKey])
+  }, [adminKey]);
 
-  const fallbackStatus = useMemo(() => {
-    if (!status) return "Unknown"
-    return status.fallbackEnabled ? "Enabled" : "Disabled"
-  }, [status])
+  const resetForm = useCallback(() => {
+    setForm(EMPTY_FORM);
+    setPendingFile(null);
+    setPreviewUrl("");
+  }, []);
 
-  const handleFetchStatus = async () => {
-    setError("")
-    try {
-      const res = await fetch("/api/admin/status", {
-        headers: { "x-admin-key": adminKey },
-      })
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}))
-        throw new Error(body.error || "Status request failed")
-      }
-      const data: StatusResponse = await res.json()
-      setStatus(data)
-    } catch (err: any) {
-      setError(err.message || "Failed to fetch status")
+  useEffect(() => {
+    if (!adminKey) {
+      setConnected(false);
+      setCars([]);
+      setSearch("");
+      resetForm();
     }
-  }
+  }, [adminKey, resetForm]);
 
-  const handleLoadLocal = async (resource: Resource) => {
-    setError("")
-    setLoadingResource(resource)
+  const fetchCars = useCallback(async () => {
+    if (!adminKey) {
+      setError("Admin key is required.");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    setConnected(false);
+
     try {
-      const res = await fetch(`/api/admin/local-data?resource=${resource}`, {
+      const response = await fetch("/api/admin/cars?limit=200", {
         headers: { "x-admin-key": adminKey },
-      })
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}))
-        throw new Error(body.error || "Failed to load local data")
+      });
+      const body = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        setConnected(false);
+        throw new Error(body?.error || "Unable to load cars.");
       }
-      const json = await res.json()
-      const items = json.cars || json.posts || []
-      setLocalData((prev) => ({ ...prev, [resource]: items }))
+
+      setCars(Array.isArray(body.cars) ? body.cars : []);
+      setConnected(true);
+      setMessage("Connected successfully.");
     } catch (err: any) {
-      setError(err.message || "Failed to load local data")
+      setConnected(false);
+      setError(err.message || "Failed to load cars.");
     } finally {
-      setLoadingResource(null)
+      setLoading(false);
     }
-  }
+  }, [adminKey]);
 
-  const handleSync = async (resource: Resource) => {
-    setError("")
-    setSyncResult(null)
-    setSyncing(resource)
+  const filteredCars = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    if (!term) return cars;
+
+    return cars.filter((car) => {
+      const haystack = [
+        car.model ?? "",
+        car.owner ?? "",
+        car.description ?? "",
+        (car.tags ?? []).join(" "),
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      return haystack.includes(term);
+    });
+  }, [cars, search]);
+
+  const selectCar = useCallback((car: AdminCar) => {
+    const formData = {
+      id: car.id,
+      model: car.model ?? "",
+      year: car.year ? String(car.year) : "",
+      owner: car.owner ?? "",
+      description: car.description ?? "",
+      tags: (car.tags ?? []).join(", "),
+      specs: Array.isArray(car.specs)
+        ? car.specs
+            .map((item: any) => {
+              if (!item) return null;
+              if (typeof item === "string") return item;
+              if (typeof item === "object" && "key" in item && "value" in item) {
+                return `${item.key}: ${item.value}`;
+              }
+              try {
+                return JSON.stringify(item);
+              } catch {
+                return String(item);
+              }
+            })
+            .filter(Boolean)
+            .join("\n")
+        : "",
+      imageUrl: car.image_url ?? "",
+      isFeatured: Boolean(car.is_featured),
+    };
+    
+    setForm(formData);
+    setPendingFile(null);
+    setPreviewUrl(resolveImageUrl(car.image_url));
+  }, []);
+
+  const handleFileChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0] ?? null;
+      setPendingFile(file);
+      setPreviewUrl(file ? URL.createObjectURL(file) : resolveImageUrl(form.imageUrl));
+    },
+    [form.imageUrl]
+  );
+
+  const handleCopyImage = useCallback((path?: string | null) => {
+    const url = resolveImageUrl(path);
+    if (!url) {
+      setMessage("This car has no image URL.");
+      return;
+    }
+
+    navigator.clipboard
+      .writeText(url)
+      .then(() => setMessage("Image URL copied."))
+      .catch(() => setError("Unable to copy image URL."));
+  }, []);
+
+  const uploadImage = useCallback(async (): Promise<UploadResponse | null> => {
+    if (!pendingFile) return null;
+
+    setUploading(true);
     try {
-      const res = await fetch("/api/admin/sync", {
+      const data = new FormData();
+      data.append("file", pendingFile);
+      data.append("slug", form.model || "car");
+
+      const response = await fetch("/api/admin/upload", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-admin-key": adminKey,
-        },
-        body: JSON.stringify({ resource }),
-      })
-      const body = await res.json().catch(() => ({}))
-      if (!res.ok) {
-        throw new Error(body.error || "Sync failed")
-      }
-      setSyncResult(body)
-      await handleFetchStatus()
-    } catch (err: any) {
-      setError(err.message || "Sync failed")
-    } finally {
-      setSyncing(null)
-    }
-  }
+        headers: { "x-admin-key": adminKey },
+        body: data,
+      });
+      const body = await response.json().catch(() => ({}));
 
-  const disabled = !adminKey
+      if (!response.ok) throw new Error(body?.error || "Upload failed.");
+
+      return body as UploadResponse;
+    } finally {
+      setUploading(false);
+    }
+  }, [adminKey, form.model, pendingFile]);
+
+  const parseTags = useCallback((value: string) => {
+    return value
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter(Boolean);
+  }, []);
+
+  const parseSpecs = useCallback((value: string) => {
+    return value
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean);
+  }, []);
+
+  const handleCarSubmit = useCallback(
+    async (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      if (!adminKey) {
+        setError("Admin key is required.");
+        return;
+      }
+
+      if (!form.model || form.model.trim().length < 2) {
+        setError("Model is required (minimum 2 characters).");
+        return;
+      }
+
+      if (form.description && form.description.length > 2000) {
+        setError("Description is too long (maximum 2000 characters).");
+        return;
+      }
+
+      setSaving(true);
+      setError(null);
+
+      try {
+        let imagePath = form.imageUrl;
+        let publicUrl = previewUrl;
+
+        if (pendingFile) {
+          const uploadResult = await uploadImage();
+          if (!uploadResult) throw new Error("Image upload failed.");
+          imagePath = uploadResult.path;
+          publicUrl = uploadResult.publicUrl;
+        }
+
+        const payload = {
+          model: form.model.trim(),
+          year: form.year ? Number(form.year) : null,
+          owner: form.owner.trim() || null,
+          description: form.description.trim() || null,
+          tags: parseTags(form.tags),
+          isFeatured: Boolean(form.isFeatured),
+          specs: parseSpecs(form.specs),
+          imageUrl: imagePath,
+        };
+
+        const endpoint = form.id ? `/api/admin/cars/${form.id}` : "/api/admin/cars";
+        const method = form.id ? "PATCH" : "POST";
+        
+        const response = await fetch(endpoint, {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+            "x-admin-key": adminKey,
+          },
+          body: JSON.stringify(payload),
+        });
+        
+        const body = await response.json().catch(() => ({}));
+
+        if (!response.ok) throw new Error(body?.error || "Failed to save car.");
+
+        setMessage(form.id ? "Car updated." : "Car created.");
+        await fetchCars();
+
+        if (form.id) {
+          setPendingFile(null);
+          setPreviewUrl(publicUrl);
+        } else {
+          resetForm();
+        }
+      } catch (err: any) {
+        setError(err.message || "Failed to save car.");
+      } finally {
+        setSaving(false);
+      }
+    },
+    [
+      adminKey,
+      fetchCars,
+      form,
+      parseSpecs,
+      parseTags,
+      pendingFile,
+      previewUrl,
+      resetForm,
+      uploadImage,
+    ]
+  );
+
+  const handleDeleteClick = useCallback((id: string) => {
+    const car = cars.find(c => c.id === id);
+    setDeleteDialog({ isOpen: true, carId: id, carModel: car?.model || "Unknown" });
+  }, [cars]);
+
+  const handleDeleteConfirm = useCallback(
+    async () => {
+      const { carId: id } = deleteDialog;
+      if (!adminKey) {
+        setError("Admin key is required.");
+        return;
+      }
+
+      setSaving(true);
+      setError(null);
+
+      try {
+        const response = await fetch(`/api/admin/cars/${id}`, {
+          method: "DELETE",
+          headers: { "x-admin-key": adminKey },
+        });
+        const body = await response.json().catch(() => ({}));
+
+        if (!response.ok) throw new Error(body?.error || "Failed to delete car.");
+
+        setMessage("Car deleted.");
+        await fetchCars();
+        if (form.id === id) resetForm();
+      } catch (err: any) {
+        setError(err.message || "Failed to delete car.");
+      } finally {
+        setSaving(false);
+        setDeleteDialog({ isOpen: false, carId: "", carModel: "" });
+      }
+    },
+    [adminKey, fetchCars, form.id, resetForm, deleteDialog]
+  );
+
+  const disableActions = saving || uploading;
+
+  const currentCarCreatedAt = useMemo(() => {
+    if (!form.id) return null;
+    return cars.find((car) => car.id === form.id)?.created_at ?? null;
+  }, [cars, form.id]);
+
+  const dashboardStats = useMemo(() => {
+    const featuredCount = cars.filter(car => car.is_featured).length;
+    const recentCount = cars.filter(car => {
+      const createdAt = new Date(car.created_at);
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      return createdAt > weekAgo;
+    }).length;
+    
+    return {
+      totalCars: cars.length,
+      featuredCars: featuredCount,
+      recentCars: recentCount,
+    };
+  }, [cars]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black text-white px-4 py-12">
-      <div className="mx-auto max-w-5xl space-y-10">
-        <header className="space-y-3">
-          <h1 className="text-3xl font-semibold tracking-tight">Admin Control Center</h1>
-          <p className="text-white/60">
-            Use this panel to monitor fallback mode, sync JSON with Supabase, and preview local data snapshots.
-          </p>
-        </header>
+    <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-slate-950 px-4 py-12 text-white">
+      <div className="mx-auto flex max-w-6xl flex-col gap-8">
+        <AdminHeader />
 
-        <section className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
-          <h2 className="text-xl font-medium mb-4">Authentication</h2>
-          <div className="grid gap-4 sm:grid-cols-[1fr_auto] items-end">
-            <label className="flex flex-col gap-2">
-              <span className="text-sm text-white/60">Admin Key</span>
-              <input
-                type="password"
-                value={adminKey}
-                onChange={(e) => setAdminKey(e.target.value)}
-                className="w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#00a0ff]"
-                placeholder="Enter admin key"
+        <AdminAuthSection
+          adminKey={adminKey}
+          setAdminKey={setAdminKey}
+          loading={loading}
+          connected={connected}
+          onConnect={fetchCars}
+        />
+
+        {connected && adminKey && (
+          <>
+            <AdminTabs activeTab={activeTab} onTabChange={setActiveTab} />
+
+            {activeTab === "dashboard" && (
+              <AdminDashboard
+                totalCars={dashboardStats.totalCars}
+                featuredCars={dashboardStats.featuredCars}
+                recentCars={dashboardStats.recentCars}
+                adminKey={adminKey}
               />
-            </label>
-            <button
-              onClick={handleFetchStatus}
-              disabled={disabled}
-              className="rounded-md bg-[#0055ff] px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:bg-white/20"
-            >
-              Refresh Status
-            </button>
-          </div>
-          <div className="mt-4 text-sm text-white/70">
-            <p>
-              Fallback mode: <span className="font-medium text-white">{fallbackStatus}</span>
-            </p>
-            {status && (
-              <p className="mt-1">
-                Local data: {status.local.cars} cars, {status.local.socialPosts} social posts
-              </p>
             )}
-          </div>
-        </section>
 
-        <section className="grid gap-6 md:grid-cols-2">
-          {(['cars', 'social-posts'] as Resource[]).map((resource) => {
-            const items = localData[resource] || []
-            const preview = items.slice(0, 3)
-            const isLoading = loadingResource === resource
-            const isSyncing = syncing === resource
-            return (
-              <div key={resource} className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
-                <header className="mb-4 flex items-center justify-between gap-2">
-                  <div>
-                    <h3 className="text-lg font-medium">{RESOURCE_LABELS[resource]}</h3>
-                    <p className="text-xs uppercase tracking-[0.2em] text-white/40">Local JSON</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleLoadLocal(resource)}
-                      disabled={disabled || isLoading}
-                      className="rounded-md border border-white/15 px-3 py-1 text-xs font-medium uppercase tracking-wide disabled:cursor-not-allowed disabled:opacity-40"
-                    >
-                      {isLoading ? "Loading..." : "Preview"}
-                    </button>
-                    <button
-                      onClick={() => handleSync(resource)}
-                      disabled={disabled || isSyncing}
-                      className="rounded-md bg-[#00a0ff] px-3 py-1 text-xs font-semibold uppercase tracking-wide disabled:cursor-not-allowed disabled:opacity-40"
-                    >
-                      {isSyncing ? "Syncing..." : "Push to Supabase"}
-                    </button>
-                  </div>
-                </header>
-                <div className="rounded-lg border border-white/10 bg-black/40 p-4 text-xs text-white/70 max-h-48 overflow-auto">
-                  {preview.length === 0 ? (
-                    <p className="text-white/40">No data loaded yet.</p>
-                  ) : (
-                    <pre className="whitespace-pre-wrap">
-                      {JSON.stringify(preview, null, 2)}
-                    </pre>
-                  )}
-                </div>
-                {items.length > preview.length && (
-                  <p className="mt-2 text-[11px] uppercase tracking-[0.3em] text-white/30">
-                    Total {items.length} records
-                  </p>
-                )}
-              </div>
-            )
-          })}
-        </section>
-
-        {(error || syncResult) && (
-          <section className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
-            <h2 className="text-xl font-medium mb-3">Operation Log</h2>
-            {error && <p className="text-sm text-red-400">{error}</p>}
-            {syncResult && (
-              <div className="text-sm text-white/70">
-                <p className="font-medium text-white">{syncResult.message}</p>
-                <div className="mt-2 grid grid-cols-3 gap-3 text-xs uppercase tracking-[0.2em] text-white/40">
-                  {syncResult.synced !== undefined && <span>Total: {syncResult.synced}</span>}
-                  {syncResult.upserted !== undefined && <span>Updated: {syncResult.upserted}</span>}
-                  {syncResult.inserted !== undefined && <span>Inserted: {syncResult.inserted}</span>}
-                </div>
+            {activeTab === "cars" && (
+              <div className="grid gap-8 lg:grid-cols-2">
+                <CarList
+                  cars={filteredCars}
+                  total={cars.length}
+                  search={search}
+                  onSearchChange={setSearch}
+                  onSelect={selectCar}
+                  onCopyImage={handleCopyImage}
+                  onDelete={handleDeleteClick}
+                  disableActions={disableActions}
+                  activeCarId={form.id}
+                  resolveImageUrl={resolveImageUrl}
+                />
+                <CarForm
+                  form={form}
+                  setForm={setForm}
+                  onSubmit={handleCarSubmit}
+                  onReset={resetForm}
+                  pendingFile={pendingFile}
+                  previewUrl={previewUrl}
+                  onFileChange={handleFileChange}
+                  disableActions={disableActions}
+                  currentCarCreatedAt={currentCarCreatedAt}
+                />
               </div>
             )}
-          </section>
+
+            {activeTab === "marketplace" && <MarketplacePanel adminKey={adminKey} />}
+            {activeTab === "users" && <UsersPanel adminKey={adminKey} />}
+            {activeTab === "analytics" && <AnalyticsPanel adminKey={adminKey} />}
+            {activeTab === "moderation" && <ModerationPanel adminKey={adminKey} />}
+          </>
         )}
-      </div>
-    </div>
-  )
-}
 
+        {!connected && <LockedState />}
+
+        <HistoryNote />
+      </div>
+
+      {message && (
+        <Toast
+          message={message}
+          type="success"
+          onClose={() => setMessage(null)}
+        />
+      )}
+      {error && (
+        <Toast
+          message={error}
+          type="error"
+          onClose={() => setError(null)}
+        />
+      )}
+
+      <ConfirmDialog
+        isOpen={deleteDialog.isOpen}
+        title="Delete Car"
+        message={`Are you sure you want to delete "${deleteDialog.carModel}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setDeleteDialog({ isOpen: false, carId: "", carModel: "" })}
+        type="danger"
+      />
+    </div>
+  );
+}
