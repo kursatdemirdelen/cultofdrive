@@ -9,9 +9,10 @@ import PostImage from "./PostImage";
 
 interface PostCardProps {
   post: SocialPost;
+  priority?: boolean;
 }
 
-export default function PostCard({ post }: PostCardProps) {
+export default function PostCard({ post, priority = false }: PostCardProps) {
   const [expanded, setExpanded] = useState(false);
 
   return (
@@ -28,6 +29,7 @@ export default function PostCard({ post }: PostCardProps) {
           username={post.username}
           likeCount={post.like_count}
           postUrl={post.url}
+          priority={priority}
         />
       )}
 
@@ -39,6 +41,7 @@ export default function PostCard({ post }: PostCardProps) {
               alt="Profile"
               fill
               className="object-cover"
+              sizes="32px"
             />
           </div>
           <div>

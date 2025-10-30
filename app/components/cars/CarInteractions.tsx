@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { CarsAPI } from "@/utils/api";
 import { supabaseBrowser } from "@/utils/supabase-browser";
-import { MessageCircle, Star } from "lucide-react";
+import { MessageCircle, Send, Trash2 } from "lucide-react";
+import Link from "next/link";
 
 interface Comment {
   id: string;
@@ -37,8 +38,6 @@ function useUserId() {
 
 export default function CarInteractions({ carId }: { carId: string }) {
   const userId = useUserId();
-  const [favoriteCount, setFavoriteCount] = useState(0);
-  const [favorited, setFavorited] = useState(false);
   const [comments, setComments] = useState<Comment[]>([]);
   const [commentBody, setCommentBody] = useState("");
   const [loading, setLoading] = useState(true);
@@ -55,18 +54,13 @@ export default function CarInteractions({ carId }: { carId: string }) {
         setLoading(true);
         setErr(null);
 
-        const [favorites, cmts] = await Promise.all([
-          CarsAPI.getFavorites(carId, userId || undefined),
-          CarsAPI.listComments(carId, 30),
-        ]);
+        const cmts = await CarsAPI.listComments(carId, 30);
 
         if (!mounted) return;
-        setFavoriteCount(favorites?.count ?? 0);
-        setFavorited(Boolean(favorites?.favorited));
         setComments(cmts?.comments ?? []);
       } catch (e: any) {
         if (!mounted) return;
-        setErr(e?.message || "Failed to load build activity");
+        setErr(e?.message || "Failed to load");
       } finally {
         if (mounted) setLoading(false);
       }
@@ -79,27 +73,11 @@ export default function CarInteractions({ carId }: { carId: string }) {
     };
   }, [carId, userId]);
 
-  async function toggleFavorite() {
-    if (!canInteract) return;
-    try {
-      if (favorited) {
-        await CarsAPI.unfavorite(carId, userId!);
-        setFavorited(false);
-        setFavoriteCount((c) => Math.max(0, c - 1));
-      } else {
-        await CarsAPI.favorite(carId, userId!);
-        setFavorited(true);
-        setFavoriteCount((c) => c + 1);
-      }
-    } catch (e: any) {
-      setErr(e?.message || "Failed to update favorite");
-    }
-  }
-
   async function submitComment() {
-    if (!commentBody.trim()) return;
+    if (!commentBody.trim() || posting) return;
     try {
       setPosting(true);
+      setErr(null);
       const { comment } = await CarsAPI.addComment(carId, commentBody.trim(), userId || undefined);
       setComments((arr) => [comment, ...arr]);
       setCommentBody("");
@@ -111,97 +89,95 @@ export default function CarInteractions({ carId }: { carId: string }) {
   }
 
   return (
-    <div className="space-y-6">
-      <section className="rounded-2xl border border-white/10 bg-black/55 p-6 shadow-glow">
-        <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      {/* Comments Section */}
+      <section className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur">
+        <div className="mb-6 flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-white">Add to your favorites</h3>
-            <p className="text-sm text-white/55">
-              Bookmark this build to find it again instantly across your devices.
+            <h3 className="mb-1 text-lg font-semibold text-white">Comments</h3>
+            <p className="text-sm text-white/60">
+              Share your thoughts about this build
             </p>
           </div>
-          <button
-            onClick={toggleFavorite}
-            disabled={!canInteract || loading}
-            className={`inline-flex items-center gap-3 rounded-full border px-5 py-2 text-sm font-semibold uppercase tracking-[0.24em] transition ${
-              favorited
-                ? "border-amber-400/40 bg-amber-500/15 text-white"
-                : "border-white/20 bg-white/5 text-white/80 hover:border-white/35 hover:bg-white/10 hover:text-white"
-            } ${!canInteract ? "cursor-not-allowed opacity-60" : ""}`}
-          >
-            <Star
-              className={`h-4 w-4 ${favorited ? "text-amber-300" : "text-white/60"}`}
-            />
-            {favorited ? "Favorited" : "Favorite"}
-            <span className="ml-2 text-base">{favoriteCount}</span>
-          </button>
-        </header>
-
-        {!canInteract && (
-          <p className="mt-4 text-xs text-white/55">
-            <a href="/auth" className="underline">
-              Sign in
-            </a>{" "}
-            to save this build and join the conversation.
-          </p>
-        )}
-      </section>
-
-      <section className="rounded-2xl border border-white/10 bg-black/55 p-6 shadow-glow">
-        <header className="mb-5 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h3 className="text-lg font-semibold text-white">Discussion</h3>
-            <p className="text-sm text-white/55">
-              Share setup notes, driving impressions, or shout-outs for the owner.
-            </p>
-          </div>
-          <div className="flex items-center gap-2 text-xs text-white/55">
+          <div className="flex items-center gap-2 text-sm text-white/60">
             <MessageCircle className="h-4 w-4" />
-            {comments.length} comment{comments.length === 1 ? "" : "s"}
+            {comments.length}
           </div>
-        </header>
+        </div>
 
-        {err && <p className="mb-4 text-sm text-rose-300">{err}</p>}
+        {err && (
+          <div className="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+            {err}
+          </div>
+        )}
 
         {canInteract ? (
-          <div className="mb-6 space-y-3">
+          <div className="mb-6">
             <textarea
               value={commentBody}
               onChange={(e) => setCommentBody(e.target.value)}
-              placeholder="What do you love about this build?"
-              className="min-h-[120px] w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white placeholder-white/45 focus:border-white/40 focus:outline-none focus:ring-0"
+              placeholder="What do you think about this build?"
+              rows={3}
+              className="w-full resize-none rounded-lg border border-white/20 bg-white/5 px-4 py-3 text-white placeholder-white/40 transition focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
             />
-            <div className="flex justify-end">
+            <div className="mt-3 flex justify-end">
               <button
                 onClick={submitComment}
                 disabled={posting || !commentBody.trim()}
-                className="rounded-full border border-white/20 bg-white/10 px-5 py-2 text-sm font-semibold uppercase tracking-[0.24em] text-white transition hover:border-white/35 hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex items-center gap-2 rounded-lg bg-white/10 px-5 py-2.5 font-medium text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {posting ? "Sharing..." : "Post comment"}
+                <Send className="h-4 w-4" />
+                {posting ? "Posting..." : "Post Comment"}
               </button>
             </div>
           </div>
         ) : (
-          <div className="mb-6 rounded-xl border border-dashed border-white/15 bg-white/5 px-4 py-4 text-sm text-white/60">
-            Sign in to join the discussion and get updates when someone replies.
+          <div className="mb-6 rounded-lg border border-dashed border-white/20 bg-white/5 p-4 text-center text-sm text-white/60">
+            <Link href="/auth" className="text-white underline hover:text-white/80">
+              Sign in
+            </Link>{" "}
+            to join the discussion
           </div>
         )}
 
-        {comments.length === 0 ? (
-          <p className="text-sm text-white/60">
-            No comments yet. Be the first to drop your insight.
-          </p>
-        ) : (
-          <ul className="space-y-4">
-            {comments.map((c) => (
-              <li key={c.id} className="rounded-xl border border-white/10 bg-white/5 px-4 py-3">
-                <p className="whitespace-pre-line text-sm text-white/85">{c.body}</p>
-                <p className="mt-2 text-xs text-white/45">
-                  {new Date(c.created_at).toLocaleString()}
-                </p>
-              </li>
+        {loading ? (
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="animate-pulse rounded-lg border border-white/10 bg-white/5 p-4">
+                <div className="mb-2 h-4 w-3/4 rounded bg-white/10" />
+                <div className="h-3 w-1/4 rounded bg-white/10" />
+              </div>
             ))}
-          </ul>
+          </div>
+        ) : comments.length === 0 ? (
+          <div className="rounded-lg border border-white/10 bg-white/5 p-8 text-center">
+            <MessageCircle className="mx-auto mb-3 h-8 w-8 text-white/40" />
+            <p className="text-sm text-white/60">No comments yet. Be the first to share your thoughts!</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {comments.map((c) => (
+              <div key={c.id} className="rounded-lg border border-white/10 bg-white/5 p-4">
+                <p className="whitespace-pre-line text-sm leading-relaxed text-white/85">{c.body}</p>
+                <div className="mt-3 flex items-center justify-between">
+                  <p className="text-xs text-white/50">
+                    {new Date(c.created_at).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                  {c.user_id === userId && (
+                    <button className="text-xs text-red-400/60 hover:text-red-400">
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </section>
     </div>

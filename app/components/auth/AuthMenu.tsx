@@ -3,15 +3,12 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { User } from "@supabase/supabase-js";
-import { ChevronDown, LogOut, PlusCircle, SquareUser } from "lucide-react";
+import { ChevronDown, LogOut, PlusCircle, Car, User as UserIcon } from "lucide-react";
 
 interface AuthMenuProps {
   user: User | null;
   onSignOut?: () => Promise<void> | void;
 }
-
-const buttonBase =
-  "inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/5 px-3.5 py-2 text-sm text-white/80 transition hover:border-white/25 hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60";
 
 export default function AuthMenu({ user, onSignOut }: AuthMenuProps) {
   const [open, setOpen] = useState(false);
@@ -34,12 +31,6 @@ export default function AuthMenu({ user, onSignOut }: AuthMenuProps) {
     }
 
     return "Driver";
-  }, [user]);
-
-  const subtitle = useMemo(() => {
-    if (!user) return "";
-    const company = user.user_metadata?.team || user.user_metadata?.company;
-    return company && typeof company === "string" ? company : user.email ?? "";
   }, [user]);
 
   const initials = useMemo(() => {
@@ -108,19 +99,18 @@ export default function AuthMenu({ user, onSignOut }: AuthMenuProps) {
           <button
             type="button"
             onClick={handleToggle}
-            className={`${buttonBase} pl-2 pr-3`}
+            className="flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-3 py-2 backdrop-blur transition hover:bg-white/10"
             aria-expanded={open}
             aria-haspopup="menu"
           >
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/12 text-sm font-semibold text-white">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-xs font-semibold text-white">
               {initials}
             </span>
-            <span className="hidden sm:flex flex-col text-left leading-tight">
-              <span className="text-sm font-medium text-white">{displayName}</span>
-              {subtitle && <span className="text-xs text-white/55">{subtitle}</span>}
+            <span className="hidden text-sm font-medium text-white sm:block">
+              {displayName}
             </span>
             <ChevronDown
-              className={`h-3.5 w-3.5 text-white/60 transition-transform ${
+              className={`h-4 w-4 text-white/60 transition-transform ${
                 open ? "rotate-180" : ""
               }`}
             />
@@ -129,33 +119,34 @@ export default function AuthMenu({ user, onSignOut }: AuthMenuProps) {
           {open && (
             <div
               role="menu"
-              className="absolute right-0 z-50 mt-2 w-56 rounded-xl border border-white/10 bg-black/85 p-2 text-sm text-white/80 shadow-glow backdrop-blur"
+              className="absolute right-0 z-50 mt-2 w-56 rounded-xl border border-white/10 bg-black/95 p-2 shadow-2xl backdrop-blur-xl"
             >
               <Link
                 href="/garage/mine"
-                className="flex items-center gap-2 rounded-lg px-3 py-2 transition hover:bg-white/10"
+                className="flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm text-white/80 transition hover:bg-white/10 hover:text-white"
                 role="menuitem"
                 onClick={() => setOpen(false)}
               >
-                <SquareUser className="h-4 w-4 text-white/60" />
-                My garage
+                <Car className="h-4 w-4" />
+                My Garage
               </Link>
               <Link
                 href="/garage/add"
-                className="flex items-center gap-2 rounded-lg px-3 py-2 transition hover:bg-white/10"
+                className="flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm text-white/80 transition hover:bg-white/10 hover:text-white"
                 role="menuitem"
                 onClick={() => setOpen(false)}
               >
-                <PlusCircle className="h-4 w-4 text-white/60" />
-                Share a build
+                <PlusCircle className="h-4 w-4" />
+                Add Car
               </Link>
+              <div className="my-2 h-px bg-white/10" />
               <button
                 type="button"
                 onClick={handleSignOut}
                 disabled={signingOut}
-                className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex w-full items-center gap-3 rounded-lg px-4 py-2.5 text-left text-sm text-red-400/80 transition hover:bg-red-500/10 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                <LogOut className="h-4 w-4 text-white/60" />
+                <LogOut className="h-4 w-4" />
                 {signingOut ? "Signing out..." : "Sign out"}
               </button>
             </div>
@@ -164,8 +155,9 @@ export default function AuthMenu({ user, onSignOut }: AuthMenuProps) {
       ) : (
         <Link
           href="/auth"
-          className={`${buttonBase} px-4 uppercase tracking-[0.24em]`}
+          className="flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm font-medium text-white backdrop-blur transition hover:bg-white/10"
         >
+          <UserIcon className="h-4 w-4" />
           Sign in
         </Link>
       )}

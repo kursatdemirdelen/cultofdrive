@@ -27,7 +27,7 @@ export default function CarCard({ car, index, onClick }: CarCardProps) {
     >
       <div className="relative h-64 overflow-hidden rounded-t-lg">
         <Image
-          src={car.imageUrl}
+          src={car.imageUrl.startsWith('public/') ? `/${car.imageUrl.replace('public/', '')}` : car.imageUrl}
           alt={car.model}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"

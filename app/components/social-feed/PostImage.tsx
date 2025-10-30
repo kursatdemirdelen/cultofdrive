@@ -6,6 +6,7 @@ interface PostImageProps {
   username: string;
   likeCount: number;
   postUrl: string;
+  priority?: boolean;
 }
 
 export default function PostImage({
@@ -13,6 +14,7 @@ export default function PostImage({
   username,
   likeCount,
   postUrl,
+  priority = false,
 }: PostImageProps) {
   return (
     <div className="relative overflow-hidden h-60 group rounded-xl">
@@ -23,6 +25,7 @@ export default function PostImage({
         className="object-cover transition-transform duration-300 group-hover:scale-105 group-hover:brightness-105"
         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         quality={85}
+        priority={priority}
       />
       <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/60 to-transparent" />
 

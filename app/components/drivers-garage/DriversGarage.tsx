@@ -1,13 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
 import { useCars } from "../hooks/useCars";
-import type { Car } from "../types/car.types";
 import GarageHeader from "./GarageHeader";
 import CarCard from "./CarCard";
-import CarModal from "./CarModal";
 import ShareCTA from "../bottom-components/ShareCTA";
+import { useRouter } from "next/navigation";
 
 const fadeUp = {
   initial: { opacity: 0, y: 20 },
@@ -16,14 +14,14 @@ const fadeUp = {
 };
 
 export default function DriversGarage() {
-  const { cars, loading, error } = useCars({ limit: 9 });
-  const [selectedCar, setSelectedCar] = useState<Car | null>(null);
+  const { cars, loading, error } = useCars({ limit: 9, featured: true });
+  const router = useRouter();
 
   if (loading) {
     return (
-      <section className="px-4 py-16 text-center text-white bg-gradient-to-b from-black to-gray-900">
+      <section className="bg-gradient-to-b from-black to-gray-900 px-4 py-16 text-center text-white">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 border-2 border-white rounded-full border-t-transparent animate-spin" />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-white border-t-transparent" />
           <p>Loading garage...</p>
         </div>
       </section>
@@ -32,30 +30,34 @@ export default function DriversGarage() {
 
   if (error) {
     return (
-      <section className="px-4 py-16 text-center text-white bg-gradient-to-b from-black to-gray-900">
+      <section className="bg-gradient-to-b from-black to-gray-900 px-4 py-16 text-center text-white">
         <p className="text-red-400">{error}</p>
       </section>
     );
   }
 
   return (
-    <section className="px-4 py-16 bg-gradient-to-b from-black to-gray-900">
+    <section className="bg-gradient-to-b from-black to-gray-900 px-4 py-16">
       <div className="mx-auto max-w-7xl">
         <GarageHeader />
 
-        {/* Cars Grid */}
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {cars.map((car, i) => (
-            <CarCard
-              key={car.id}
-              car={car}
-              index={i}
-              onClick={() => setSelectedCar(car)}
-            />
-          ))}
-        </div>
+        {cars.length === 0 ? (
+          <div className="rounded-3xl border border-white/10 bg-black/50 p-10 text-center text-white/60">
+            No featured cars yet. Mark a car as featured in the admin panel to display it here.
+          </div>
+        ) : (
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {cars.map((car, i) => (
+              <CarCard
+                key={car.id}
+                car={car}
+                index={i}
+                onClick={() => router.push(`/cars/${car.id}`)}
+              />
+            ))}
+          </div>
+        )}
 
-        {/* CTA */}
         <motion.div
           {...fadeUp}
           transition={{ ...fadeUp.transition, delay: 0.3 }}
@@ -63,9 +65,6 @@ export default function DriversGarage() {
         >
           <ShareCTA />
         </motion.div>
-
-        {/* Modal */}
-        <CarModal car={selectedCar} onClose={() => setSelectedCar(null)} />
       </div>
     </section>
   );

@@ -9,6 +9,7 @@ type UseCarsParams = {
   tag?: string;
   userId?: string;
   limit?: number;
+  featured?: boolean;
 };
 
 export function useCars(params?: UseCarsParams) {
@@ -29,10 +30,16 @@ export function useCars(params?: UseCarsParams) {
         if (params?.tag) qs.set("tag", params.tag);
         if (params?.userId) qs.set("user_id", params.userId);
         if (params?.limit) qs.set("limit", String(params.limit));
+        if (params?.featured !== undefined) qs.set("featured", String(params.featured));
 
         const res = await fetch(`/api/cars${qs.toString() ? `?${qs.toString()}` : ""}`, {
           cache: "no-store",
           signal: controller.signal,
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
         });
 
         if (!res.ok) {
@@ -56,7 +63,7 @@ export function useCars(params?: UseCarsParams) {
     load();
 
     return () => controller.abort();
-  }, [params?.q, params?.owner, params?.tag, params?.userId, params?.limit]);
+  }, [params?.q, params?.owner, params?.tag, params?.userId, params?.limit, params?.featured]);
 
   return { cars, loading, error };
 }

@@ -46,10 +46,10 @@ export default function HeroSection({ scrollToSection }: HeroSectionProps) {
               </p>
 
               <div className="flex flex-wrap gap-3">
-                <button type="button" onClick={handleExplore} className={actionClasses}>
+                <Link href="/garage" className={actionClasses}>
                   <Car className="h-4 w-4 text-white/65" />
-                  Explore garage
-                </button>
+                  Discover builds
+                </Link>
                 <Link href="/garage/add" className={actionClasses}>
                   <Share2 className="h-4 w-4 text-white/65" />
                   Share your build

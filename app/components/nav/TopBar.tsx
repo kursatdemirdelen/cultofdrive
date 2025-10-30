@@ -6,9 +6,7 @@ import { usePathname } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import AuthMenu from "@/app/components/auth/AuthMenu";
 import { supabaseBrowser } from "@/utils/supabase-browser";
-
-const linkBase =
-  "rounded-full px-3.5 py-1.5 text-xs font-medium uppercase tracking-[0.28em] transition";
+import { NotificationBell } from "@/app/components/notifications/NotificationBell";
 
 export default function TopBar() {
   const pathname = usePathname();
@@ -34,12 +32,12 @@ export default function TopBar() {
 
   const navLinks = useMemo(() => {
     const base = [
-      { href: "/garage", label: "Garage" },
-      { href: "/feed", label: "Social Feed" },
+      { href: "/garage", label: "Discover" },
+      { href: "/marketplace", label: "Marketplace" },
     ];
 
     if (user) {
-      base.splice(1, 0, { href: "/garage/mine", label: "My Garage" });
+      base.push({ href: "/garage/mine", label: "My Garage" });
     }
 
     return base;
@@ -49,9 +47,11 @@ export default function TopBar() {
     await supabaseBrowser.auth.signOut();
   };
 
+  const isAdminPage = pathname?.startsWith("/admin");
+
   return (
-    <header className="fixed inset-x-0 top-0 z-40 border-b border-white/10 bg-black/60 backdrop-blur">
-      <div className="flex items-center justify-between h-16 max-w-6xl px-4 mx-auto sm:px-6">
+    <header className="fixed inset-x-0 top-0 z-40 border-b border-white/10 bg-black/80 backdrop-blur-xl">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link
           href="/"
           className="font-heading text-lg tracking-[0.18em] text-white transition hover:text-white/80"
@@ -59,26 +59,35 @@ export default function TopBar() {
           CULT OF DRIVE
         </Link>
 
-        <div className="flex items-center gap-4">
-          <nav className="flex items-center gap-2 text-[11px] text-white/70 sm:text-xs">
+        <div className="flex items-center gap-6">
+          <nav className="hidden items-center gap-1 sm:flex">
             {navLinks.map(({ href, label }) => {
-              const active = pathname.startsWith(href);
+              const active = pathname === href || pathname?.startsWith(href + "/");
               return (
                 <Link
                   key={href}
                   href={href}
-                  className={`${linkBase} ${
+                  className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
                     active
-                      ? "bg-white/20 text-white"
-                      : "text-white/70 hover:bg-white/10 hover:text-white"
+                      ? "bg-white/10 text-white"
+                      : "text-white/70 hover:bg-white/5 hover:text-white"
                   }`}
                 >
                   {label}
                 </Link>
               );
             })}
+            {isAdminPage && (
+              <Link
+                href="/admin"
+                className="flex items-center gap-2 rounded-lg bg-red-500/10 px-4 py-2 text-sm font-medium text-red-400 transition hover:bg-red-500/20"
+              >
+                Admin
+              </Link>
+            )}
           </nav>
 
+          <NotificationBell />
           <AuthMenu user={user} onSignOut={handleSignOut} />
         </div>
       </div>
