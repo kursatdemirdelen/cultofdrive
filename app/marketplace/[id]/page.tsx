@@ -44,7 +44,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
                   src={
                     listing.image_url
                       ? (listing.image_url.startsWith('http') ? listing.image_url : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/garage/${listing.image_url}`)
-                      : (listing.cars.image_url.startsWith('public/') ? `/${listing.cars.image_url.replace('public/', '')}` : listing.cars.image_url)
+                      : (listing.cars?.image_url?.startsWith('public/') ? `/${listing.cars.image_url.replace('public/', '')}` : listing.cars?.image_url || '')
                   }
                   alt={listing.title}
                   fill
