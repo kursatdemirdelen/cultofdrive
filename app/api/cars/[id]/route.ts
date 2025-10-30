@@ -10,6 +10,7 @@ type DbCar = {
   description: string | null
   specs: any[] | null
   tags: string[] | null
+  is_featured: boolean | null
   created_at: string
 }
 
@@ -21,7 +22,7 @@ export async function GET(
     const { id } = await ctx.params
     const { data, error } = await supabase
       .from('cars')
-      .select('id, model, year, owner, image_url, description, specs, tags, created_at')
+      .select('id, model, year, owner, image_url, description, specs, tags, is_featured, created_at')
       .eq('id', id)
       .maybeSingle()
 
@@ -50,11 +51,48 @@ export async function GET(
       description: row.description || '',
       specs,
       tags: row.tags || [],
+      isFeatured: Boolean(row.is_featured),
       created_at: row.created_at,
     }
 
     return NextResponse.json({ car })
   } catch (err) {
     return NextResponse.json({ error: 'Failed to fetch car' }, { status: 500 })
+  }
+}
+
+export async function PATCH(
+  req: Request,
+  ctx: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await ctx.params
+    const body = await req.json()
+
+    const updates: Record<string, any> = {}
+    if (body.model !== undefined) updates.model = String(body.model)
+    if (body.year !== undefined) updates.year = body.year ? Number(body.year) : null
+    if (body.owner !== undefined) updates.owner = body.owner || null
+    if (body.description !== undefined) updates.description = body.description || null
+    if (body.specs !== undefined) updates.specs = Array.isArray(body.specs) ? body.specs : []
+    if (body.tags !== undefined) updates.tags = Array.isArray(body.tags) ? body.tags : []
+
+    if (Object.keys(updates).length === 0) {
+      return NextResponse.json({ error: 'No fields to update' }, { status: 400 })
+    }
+
+    const { data, error } = await supabase
+      .from('cars')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .maybeSingle()
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    if (!data) return NextResponse.json({ error: 'Car not found' }, { status: 404 })
+
+    return NextResponse.json({ car: data })
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message || 'Failed to update' }, { status: 500 })
   }
 }

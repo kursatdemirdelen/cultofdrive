@@ -10,7 +10,9 @@ type DbCar = {
   description: string | null
   specs: any[] | null
   tags: string[] | null
+  is_featured: boolean | null
   created_at: string
+  user_id: string | null
 }
 
 export async function GET(req: Request) {
@@ -21,30 +23,40 @@ export async function GET(req: Request) {
     const tag = searchParams.get('tag') || ''
     const userId = searchParams.get('user_id') || ''
     const limitParam = searchParams.get('limit')
-    const limit = limitParam ? Math.max(1, Math.min(50, Number(limitParam))) : 9
+    const offsetParam = searchParams.get('offset')
+    const featuredParam = searchParams.get('featured')
+    
+    const limit = limitParam ? Math.max(1, Math.min(100, Number(limitParam))) : 20
+    const offset = offsetParam ? Math.max(0, Number(offsetParam)) : 0
 
     let query = supabase
       .from('cars')
-      .select('id, model, year, owner, image_url, description, specs, tags, created_at')
+      .select('id, model, year, owner, image_url, description, specs, tags, is_featured, created_at, user_id', { count: 'exact' })
       .order('created_at', { ascending: false })
-      .limit(limit)
+      .range(offset, offset + limit - 1)
 
     if (owner) {
-      query = query.ilike('owner', owner)
+      query = query.ilike('owner', `%${owner}%`)
     }
+    
     if (userId) {
       query = query.eq('user_id', userId)
     }
+    
     if (q) {
-      // naive search across model and description
-      query = query.or(`model.ilike.%${q}%,description.ilike.%${q}%`)
+      query = query.or(`model.ilike.%${q}%,description.ilike.%${q}%,owner.ilike.%${q}%`)
     }
+    
     if (tag) {
-      // tags is an array; use contains
       query = query.contains('tags', [tag])
     }
+    
+    if (featuredParam !== null && featuredParam !== undefined) {
+      const isFeatured = featuredParam === 'true'
+      query = query.eq('is_featured', isFeatured)
+    }
 
-    const { data, error } = await query
+    const { data, error, count } = await query
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
@@ -57,7 +69,6 @@ export async function GET(req: Request) {
         imageUrl = pub?.publicUrl || row.image_url
       }
 
-      // Normalize specs to string[] for UI
       let specs: string[] = []
       if (Array.isArray(row.specs)) {
         specs = row.specs.map((s: any) => {
@@ -65,7 +76,11 @@ export async function GET(req: Request) {
           if (s && typeof s === 'object' && 'key' in s && 'value' in s) {
             return `${(s as any).key}: ${(s as any).value}`
           }
-          try { return JSON.stringify(s) } catch { return String(s) }
+          try {
+            return JSON.stringify(s)
+          } catch {
+            return String(s)
+          }
         })
       }
 
@@ -78,10 +93,20 @@ export async function GET(req: Request) {
         description: row.description || '',
         specs,
         tags: row.tags || [],
+        isFeatured: Boolean(row.is_featured),
+        created_at: row.created_at,
       }
     })
 
-    return NextResponse.json({ cars })
+    return NextResponse.json({ 
+      cars,
+      pagination: {
+        total: count || 0,
+        limit,
+        offset,
+        hasMore: (count || 0) > offset + limit
+      }
+    })
   } catch (err) {
     return NextResponse.json({ error: 'Failed to fetch cars' }, { status: 500 })
   }

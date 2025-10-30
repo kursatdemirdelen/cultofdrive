@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { supabase } from '@/utils/supabase'
+import { notifyCarOwner } from '@/utils/notifications'
 
 export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }) {
   try {
@@ -33,6 +34,15 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       .select('id, body, user_id, created_at')
       .maybeSingle()
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    // Get car model for notification
+    if (user_id) {
+      const { data: car } = await supabase.from('cars').select('model').eq('id', id).single()
+      if (car) {
+        await notifyCarOwner(id, user_id, 'comment', `Someone commented on your ${car.model}`)
+      }
+    }
+
     return NextResponse.json({ comment: data }, { status: 201 })
   } catch (e) {
     return NextResponse.json({ error: 'Failed to add comment' }, { status: 500 })
