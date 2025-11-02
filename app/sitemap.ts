@@ -1,18 +1,33 @@
 import type { MetadataRoute } from "next";
+import { supabase } from "@/utils/supabase";
+
+export const revalidate = 3600; // Revalidate every hour
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://cultofdrive.com";
 
-  // Fetch all cars for dynamic routes
+  // Fetch cars directly from database
   let cars: Array<{ id: string; created_at: string }> = [];
   try {
-    const res = await fetch(`${baseUrl}/api/cars`, { cache: "no-store" });
-    if (res.ok) {
-      const data = await res.json();
-      cars = data.cars || [];
-    }
+    const { data } = await supabase
+      .from("cars")
+      .select("id, created_at")
+      .order("created_at", { ascending: false });
+    cars = data || [];
   } catch (error) {
     console.error("Failed to fetch cars for sitemap:", error);
+  }
+
+  // Fetch driver profiles
+  let drivers: Array<{ slug: string; updated_at: string }> = [];
+  try {
+    const { data } = await supabase
+      .from("user_profiles")
+      .select("slug, updated_at")
+      .order("updated_at", { ascending: false });
+    drivers = data || [];
+  } catch (error) {
+    console.error("Failed to fetch drivers for sitemap:", error);
   }
 
   // Static routes
@@ -36,5 +51,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  return [...routes, ...carRoutes];
+  // Driver profile routes
+  const driverRoutes = drivers.map((driver) => ({
+    url: `${baseUrl}/driver/${driver.slug}`,
+    lastModified: new Date(driver.updated_at),
+    changeFrequency: "weekly" as const,
+    priority: 0.7,
+  }));
+
+  return [...routes, ...carRoutes, ...driverRoutes];
 }

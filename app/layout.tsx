@@ -12,18 +12,28 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
   ),
-  title: "Cult of Drive - 90s-2000s BMW Culture",
+  title: {
+    default: "Cult of Drive - 90s-2000s BMW Culture",
+    template: "%s | Cult of Drive",
+  },
   description:
-    "Experience the golden era of BMW. Pure driving machines, no compromises. Join the community for classic BMW enthusiasts.",
+    "A curated digital garage for 90s-2000s BMW enthusiasts. Share builds, connect with drivers, and preserve automotive stories. Join the community celebrating E36, E46, and classic BMW culture.",
   keywords: [
     "BMW",
     "E36",
     "E46",
+    "E39",
+    "E30",
     "classic cars",
     "90s BMW",
     "2000s BMW",
+    "BMW builds",
+    "BMW community",
     "driving culture",
     "automotive community",
+    "car enthusiasts",
+    "BMW garage",
+    "BMW marketplace",
   ],
   authors: [{ name: "Cult of Drive" }],
   creator: "Cult of Drive",
@@ -31,16 +41,17 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Cult of Drive - 90s-2000s BMW Culture",
     description:
-      "Experience the golden era of BMW. Pure driving machines, no compromises.",
+      "A curated digital garage for 90s-2000s BMW enthusiasts. Share builds, connect with drivers, and preserve automotive stories.",
     siteName: "Cult of Drive",
     locale: "en_US",
     type: "website",
+    url: process.env.NEXT_PUBLIC_SITE_URL || "https://cultofdrive.com",
     images: [
       {
         url: "/images/bmw-e36.png",
-        width: 1024,
-        height: 640,
-        alt: "BMW E36 - Cult of Drive",
+        width: 1200,
+        height: 630,
+        alt: "Cult of Drive - BMW Community",
       },
     ],
   },
@@ -48,8 +59,9 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Cult of Drive - 90s-2000s BMW Culture",
     description:
-      "Experience the golden era of BMW. Pure driving machines, no compromises.",
+      "A curated digital garage for 90s-2000s BMW enthusiasts. Share builds, connect with drivers, and preserve automotive stories.",
     images: ["/images/bmw-e36.png"],
+    creator: "@cultofdrive",
   },
   robots: {
     index: true,
@@ -71,6 +83,10 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" className={inter.className}>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#000000" />
+      </head>
       <body>
         <TopBar />
         <main className="pt-8 md:pt-12">{children}</main>

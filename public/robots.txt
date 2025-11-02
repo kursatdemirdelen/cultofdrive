@@ -1,10 +1,28 @@
 # Cult of Drive - Robots.txt
+# A curated digital garage for 90s-2000s BMW enthusiasts
+
 User-agent: *
 Allow: /
+
+# Disallow admin and private areas
 Disallow: /admin
+Disallow: /admin/*
+Disallow: /profile/edit
+
+# Disallow API endpoints
 Disallow: /api/
+
+# Disallow edit pages
 Disallow: /garage/edit/
 Disallow: /marketplace/edit/
+Disallow: /marketplace/create
+
+# Allow public pages
+Allow: /garage
+Allow: /marketplace
+Allow: /cars/
+Allow: /driver/
+Allow: /auth
 
 # Sitemap
 Sitemap: https://cultofdrive.com/sitemap.xml

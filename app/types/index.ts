@@ -25,3 +25,17 @@ export interface UserProfile {
   created_at: string;
   updated_at: string;
 }
+
+export interface SocialPost {
+  id: string;
+  media_url?: string;
+  imageUrl?: string;
+  caption?: string;
+  content?: string;
+  permalink?: string;
+  url?: string;
+  timestamp?: string;
+  username?: string;
+  profilePic?: string;
+  like_count?: number;
+}

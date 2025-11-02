@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { SocialPost } from "../types/social.types";
+import type { SocialPost } from "@/app/types";
 
 export function useSocialPosts() {
   const [posts, setPosts] = useState<SocialPost[]>([]);

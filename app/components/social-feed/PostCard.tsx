@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import Image from "next/image";
 import { formatDistanceToNow } from "date-fns";
-import type { SocialPost } from "../types/social.types";
+import type { SocialPost } from "@/app/types";
 import PostImage from "./PostImage";
 
 interface PostCardProps {
@@ -26,9 +26,9 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
       {post.imageUrl && (
         <PostImage
           imageUrl={post.imageUrl}
-          username={post.username}
-          likeCount={post.like_count}
-          postUrl={post.url}
+          username={post.username || 'Anonymous'}
+          likeCount={post.like_count || 0}
+          postUrl={post.url || '#'}
           priority={priority}
         />
       )}
@@ -65,7 +65,7 @@ export default function PostCard({ post, priority = false }: PostCardProps) {
         >
           {post.content}
         </p>
-        {post.content.length > 200 && (
+        {(post.content?.length || 0) > 200 && (
           <button
             onClick={() => setExpanded(!expanded)}
             className="text-xs transition-colors text-white/50 hover:text-white/70"
