@@ -79,74 +79,74 @@ export function AnalyticsPanel({ adminKey }: Props) {
         <h2 className="text-xl font-medium text-white">Analytics</h2>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-6">
-        <div className="rounded-lg border border-white/10 bg-white/5 p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Eye className="h-4 w-4 text-blue-400" />
-            <span className="text-sm text-white/60">Total Views</span>
+      <div className="grid gap-3 grid-cols-2 lg:grid-cols-5 mb-6">
+        <div className="rounded-lg border border-white/10 bg-white/5 p-3 lg:p-4">
+          <div className="flex items-center gap-2 mb-1 lg:mb-2">
+            <Eye className="h-3 w-3 lg:h-4 lg:w-4 text-blue-400" />
+            <span className="text-xs lg:text-sm text-white/60">Views</span>
           </div>
-          <p className="text-2xl font-bold text-white">{(analytics.total_views || 0).toLocaleString()}</p>
+          <p className="text-lg lg:text-2xl font-bold text-white">{(analytics.total_views || 0).toLocaleString()}</p>
         </div>
 
-        <div className="rounded-lg border border-white/10 bg-white/5 p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Heart className="h-4 w-4 text-red-400" />
-            <span className="text-sm text-white/60">Total Favorites</span>
+        <div className="rounded-lg border border-white/10 bg-white/5 p-3 lg:p-4">
+          <div className="flex items-center gap-2 mb-1 lg:mb-2">
+            <Heart className="h-3 w-3 lg:h-4 lg:w-4 text-red-400" />
+            <span className="text-xs lg:text-sm text-white/60">Favorites</span>
           </div>
-          <p className="text-2xl font-bold text-white">{(analytics.total_favorites || 0).toLocaleString()}</p>
+          <p className="text-lg lg:text-2xl font-bold text-white">{(analytics.total_favorites || 0).toLocaleString()}</p>
         </div>
 
-        <div className="rounded-lg border border-white/10 bg-white/5 p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <MessageSquare className="h-4 w-4 text-green-400" />
-            <span className="text-sm text-white/60">Total Comments</span>
+        <div className="rounded-lg border border-white/10 bg-white/5 p-3 lg:p-4">
+          <div className="flex items-center gap-2 mb-1 lg:mb-2">
+            <MessageSquare className="h-3 w-3 lg:h-4 lg:w-4 text-green-400" />
+            <span className="text-xs lg:text-sm text-white/60">Comments</span>
           </div>
-          <p className="text-2xl font-bold text-white">{(analytics.total_comments || 0).toLocaleString()}</p>
+          <p className="text-lg lg:text-2xl font-bold text-white">{(analytics.total_comments || 0).toLocaleString()}</p>
         </div>
 
-        <div className="rounded-lg border border-white/10 bg-white/5 p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="h-4 w-4 text-yellow-400" />
-            <span className="text-sm text-white/60">Total Users</span>
+        <div className="rounded-lg border border-white/10 bg-white/5 p-3 lg:p-4">
+          <div className="flex items-center gap-2 mb-1 lg:mb-2">
+            <TrendingUp className="h-3 w-3 lg:h-4 lg:w-4 text-yellow-400" />
+            <span className="text-xs lg:text-sm text-white/60">Users</span>
           </div>
-          <p className="text-2xl font-bold text-white">{(analytics.total_users || 0).toLocaleString()}</p>
+          <p className="text-lg lg:text-2xl font-bold text-white">{(analytics.total_users || 0).toLocaleString()}</p>
         </div>
 
-        <div className="rounded-lg border border-white/10 bg-white/5 p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="h-4 w-4 text-orange-400" />
-            <span className="text-sm text-white/60">Total Listings</span>
+        <div className="rounded-lg border border-white/10 bg-white/5 p-3 lg:p-4">
+          <div className="flex items-center gap-2 mb-1 lg:mb-2">
+            <TrendingUp className="h-3 w-3 lg:h-4 lg:w-4 text-orange-400" />
+            <span className="text-xs lg:text-sm text-white/60">Listings</span>
           </div>
-          <p className="text-2xl font-bold text-white">{(analytics.total_listings || 0).toLocaleString()}</p>
+          <p className="text-lg lg:text-2xl font-bold text-white">{(analytics.total_listings || 0).toLocaleString()}</p>
         </div>
       </div>
 
       {analytics.growth_data && (
-        <div className="mb-6 grid gap-4 sm:grid-cols-2">
-          <div className="rounded-lg border border-white/10 bg-white/5 p-4">
-            <h3 className="mb-3 text-sm font-medium text-white/80">User Growth</h3>
-            <div className="flex items-end gap-4">
+        <div className="mb-6 grid gap-3 sm:grid-cols-2">
+          <div className="rounded-lg border border-white/10 bg-white/5 p-3 lg:p-4">
+            <h3 className="mb-2 lg:mb-3 text-xs lg:text-sm font-medium text-white/80">User Growth</h3>
+            <div className="flex items-end gap-3 lg:gap-4">
               <div>
                 <p className="text-xs text-white/50">This Week</p>
-                <p className="text-2xl font-bold text-green-400">+{analytics.growth_data.users_this_week}</p>
+                <p className="text-xl lg:text-2xl font-bold text-green-400">+{analytics.growth_data.users_this_week}</p>
               </div>
               <div>
                 <p className="text-xs text-white/50">Last Week</p>
-                <p className="text-xl font-bold text-white/60">{analytics.growth_data.users_last_week}</p>
+                <p className="text-lg lg:text-xl font-bold text-white/60">{analytics.growth_data.users_last_week}</p>
               </div>
             </div>
           </div>
 
-          <div className="rounded-lg border border-white/10 bg-white/5 p-4">
-            <h3 className="mb-3 text-sm font-medium text-white/80">Car Growth</h3>
-            <div className="flex items-end gap-4">
+          <div className="rounded-lg border border-white/10 bg-white/5 p-3 lg:p-4">
+            <h3 className="mb-2 lg:mb-3 text-xs lg:text-sm font-medium text-white/80">Car Growth</h3>
+            <div className="flex items-end gap-3 lg:gap-4">
               <div>
                 <p className="text-xs text-white/50">This Week</p>
-                <p className="text-2xl font-bold text-blue-400">+{analytics.growth_data.cars_this_week}</p>
+                <p className="text-xl lg:text-2xl font-bold text-blue-400">+{analytics.growth_data.cars_this_week}</p>
               </div>
               <div>
                 <p className="text-xs text-white/50">Last Week</p>
-                <p className="text-xl font-bold text-white/60">{analytics.growth_data.cars_last_week}</p>
+                <p className="text-lg lg:text-xl font-bold text-white/60">{analytics.growth_data.cars_last_week}</p>
               </div>
             </div>
           </div>

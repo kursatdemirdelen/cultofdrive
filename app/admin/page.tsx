@@ -32,7 +32,6 @@ type UploadResponse = {
 const EMPTY_FORM: CarFormState = {
   model: "",
   year: "",
-  owner: "",
   description: "",
   tags: "",
   specs: "",
@@ -141,7 +140,6 @@ export default function AdminPage() {
     return cars.filter((car) => {
       const haystack = [
         car.model ?? "",
-        car.owner ?? "",
         car.description ?? "",
         (car.tags ?? []).join(" "),
       ]
@@ -157,7 +155,6 @@ export default function AdminPage() {
       id: car.id,
       model: car.model ?? "",
       year: car.year ? String(car.year) : "",
-      owner: car.owner ?? "",
       description: car.description ?? "",
       tags: (car.tags ?? []).join(", "),
       specs: Array.isArray(car.specs)
@@ -281,7 +278,6 @@ export default function AdminPage() {
         const payload = {
           model: form.model.trim(),
           year: form.year ? Number(form.year) : null,
-          owner: form.owner.trim() || null,
           description: form.description.trim() || null,
           tags: parseTags(form.tags),
           isFeatured: Boolean(form.isFeatured),
@@ -395,7 +391,7 @@ export default function AdminPage() {
   }, [cars]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-slate-950 px-4 py-12 text-white">
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 px-4 py-12 text-white">
       <div className="mx-auto flex max-w-6xl flex-col gap-8">
         <AdminHeader />
 

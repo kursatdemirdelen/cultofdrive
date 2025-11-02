@@ -104,15 +104,15 @@ export function MarketplacePanel({ adminKey }: Props) {
 
   return (
     <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
+      <div className="mb-6">
+        <div className="flex items-center gap-3 mb-4">
           <Package className="h-6 w-6 text-white" />
           <h2 className="text-xl font-medium text-white">Marketplace Management</h2>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setFilter("all")}
-            className={`px-3 py-1.5 text-sm rounded-lg transition ${
+            className={`px-3 py-1.5 text-xs sm:text-sm rounded-lg transition ${
               filter === "all" ? "bg-white/20 text-white" : "bg-white/5 text-white/60 hover:bg-white/10"
             }`}
           >
@@ -120,7 +120,7 @@ export function MarketplacePanel({ adminKey }: Props) {
           </button>
           <button
             onClick={() => setFilter("active")}
-            className={`px-3 py-1.5 text-sm rounded-lg transition ${
+            className={`px-3 py-1.5 text-xs sm:text-sm rounded-lg transition ${
               filter === "active" ? "bg-white/20 text-white" : "bg-white/5 text-white/60 hover:bg-white/10"
             }`}
           >
@@ -128,7 +128,7 @@ export function MarketplacePanel({ adminKey }: Props) {
           </button>
           <button
             onClick={() => setFilter("sold")}
-            className={`px-3 py-1.5 text-sm rounded-lg transition ${
+            className={`px-3 py-1.5 text-xs sm:text-sm rounded-lg transition ${
               filter === "sold" ? "bg-white/20 text-white" : "bg-white/5 text-white/60 hover:bg-white/10"
             }`}
           >
@@ -144,16 +144,16 @@ export function MarketplacePanel({ adminKey }: Props) {
           {filteredListings.map((listing) => (
             <div
               key={listing.id}
-              className="flex items-center gap-4 rounded-lg border border-white/10 bg-white/5 p-4"
+              className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 rounded-lg border border-white/10 bg-white/5 p-3 sm:p-4"
             >
-              <div className="relative h-16 w-24 flex-shrink-0 overflow-hidden rounded bg-white/5">
+              <div className="relative h-32 sm:h-16 w-full sm:w-24 flex-shrink-0 overflow-hidden rounded bg-white/5">
                 {listing.image_url ? (
                   <Image
                     src={listing.image_url.startsWith('http') ? listing.image_url : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/garage/${listing.image_url}`}
                     alt={listing.title}
                     fill
                     className="object-cover"
-                    sizes="96px"
+                    sizes="(max-width: 640px) 100vw, 96px"
                   />
                 ) : (
                   <div className="flex h-full items-center justify-center text-white/40">
@@ -169,9 +169,9 @@ export function MarketplacePanel({ adminKey }: Props) {
                   ) : (
                     <Wrench className="h-4 w-4 text-white/60" />
                   )}
-                  <h3 className="font-medium text-white truncate">{listing.title}</h3>
+                  <h3 className="font-medium text-white truncate text-sm sm:text-base">{listing.title}</h3>
                 </div>
-                <div className="flex items-center gap-3 text-xs text-white/50">
+                <div className="flex items-center gap-2 sm:gap-3 text-xs text-white/50 flex-wrap">
                   <span>${listing.price.toLocaleString()}</span>
                   <span>•</span>
                   <span className="flex items-center gap-1">
@@ -183,24 +183,26 @@ export function MarketplacePanel({ adminKey }: Props) {
                 </div>
               </div>
 
-              <select
-                value={listing.status}
-                onChange={(e) => handleStatusChange(listing.id, e.target.value)}
-                className="rounded border border-white/20 bg-white/5 px-3 py-1.5 text-sm text-white"
-              >
-                <option value="active" className="bg-slate-900">Active</option>
-                <option value="sold" className="bg-slate-900">Sold</option>
-                <option value="expired" className="bg-slate-900">Expired</option>
-                <option value="removed" className="bg-slate-900">Removed</option>
-              </select>
+              <div className="flex items-center gap-2 w-full sm:w-auto">
+                <select
+                  value={listing.status}
+                  onChange={(e) => handleStatusChange(listing.id, e.target.value)}
+                  className="flex-1 sm:flex-initial rounded border border-white/20 bg-white/5 px-2 sm:px-3 py-1.5 text-xs sm:text-sm text-white min-w-0"
+                >
+                  <option value="active" className="bg-slate-900">Active</option>
+                  <option value="sold" className="bg-slate-900">Sold</option>
+                  <option value="expired" className="bg-slate-900">Expired</option>
+                  <option value="removed" className="bg-slate-900">Removed</option>
+                </select>
 
-              <button
-                onClick={() => handleDelete(listing.id)}
-                disabled={deleting === listing.id}
-                className="rounded-lg border border-red-500/30 bg-red-500/10 p-2 text-red-400 transition hover:bg-red-500/20 disabled:opacity-50"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
+                <button
+                  onClick={() => handleDelete(listing.id)}
+                  disabled={deleting === listing.id}
+                  className="flex-shrink-0 rounded-lg border border-red-500/30 bg-red-500/10 p-2 text-red-400 transition hover:bg-red-500/20 disabled:opacity-50"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
             </div>
           ))}
         </div>

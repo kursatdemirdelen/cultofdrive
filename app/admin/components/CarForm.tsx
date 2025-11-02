@@ -96,38 +96,22 @@ export function CarForm({
           />
         </div>
 
-        {/* Year & Owner */}
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label htmlFor="year" className="mb-2 block text-sm font-medium text-white/80">
-              Year
-            </label>
-            <input
-              id="year"
-              type="number"
-              value={form.year}
-              onChange={(e) => setForm({ ...form, year: e.target.value })}
-              placeholder="1995"
-              min="1990"
-              max={new Date().getFullYear()}
-              className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-2.5 text-white placeholder-white/40 transition focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
-              disabled={disableActions}
-            />
-          </div>
-          <div>
-            <label htmlFor="owner" className="mb-2 block text-sm font-medium text-white/80">
-              Owner
-            </label>
-            <input
-              id="owner"
-              type="text"
-              value={form.owner}
-              onChange={(e) => setForm({ ...form, owner: e.target.value })}
-              placeholder="Owner name"
-              className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-2.5 text-white placeholder-white/40 transition focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
-              disabled={disableActions}
-            />
-          </div>
+        {/* Year */}
+        <div>
+          <label htmlFor="year" className="mb-2 block text-sm font-medium text-white/80">
+            Year
+          </label>
+          <input
+            id="year"
+            type="number"
+            value={form.year}
+            onChange={(e) => setForm({ ...form, year: e.target.value })}
+            placeholder="1995"
+            min="1990"
+            max={new Date().getFullYear()}
+            className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-2.5 text-white placeholder-white/40 transition focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
+            disabled={disableActions}
+          />
         </div>
 
         {/* Description */}

@@ -50,18 +50,18 @@ export function AdminDashboard({ totalCars, featuredCars, recentCars, adminKey }
     <div className="space-y-6">
       <div>
         <h2 className="mb-4 text-xl font-medium text-white">Overview</h2>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
           {stats.map(({ label, value, icon: Icon, color }) => (
             <div
               key={label}
-              className={`rounded-xl border border-white/10 bg-gradient-to-br ${color} p-6 backdrop-blur`}
+              className={`rounded-xl border border-white/10 bg-gradient-to-br ${color} p-4 lg:p-6 backdrop-blur`}
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-white/60">{label}</p>
-                  <p className="mt-2 text-3xl font-bold text-white">{value.toLocaleString()}</p>
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-2">
+                <div className="flex-1">
+                  <p className="text-xs lg:text-sm font-medium text-white/60">{label}</p>
+                  <p className="mt-1 lg:mt-2 text-xl lg:text-3xl font-bold text-white">{value.toLocaleString()}</p>
                 </div>
-                <Icon className="h-8 w-8 text-white/40" />
+                <Icon className="h-6 w-6 lg:h-8 lg:w-8 text-white/40" />
               </div>
             </div>
           ))}
