@@ -5,7 +5,6 @@ type DbCar = {
   id: string
   model: string
   year: number | null
-  owner: string | null
   image_url: string | null
   description: string | null
   specs: any[] | null
@@ -19,7 +18,6 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url)
     const q = searchParams.get('q') || ''
-    const owner = searchParams.get('owner') || ''
     const tag = searchParams.get('tag') || ''
     const userId = searchParams.get('user_id') || ''
     const limitParam = searchParams.get('limit')
@@ -31,20 +29,19 @@ export async function GET(req: Request) {
 
     let query = supabase
       .from('cars')
-      .select('id, model, year, owner, image_url, description, specs, tags, is_featured, created_at, user_id', { count: 'exact' })
+      .select(`
+        id, model, year, image_url, description, specs, tags, is_featured, created_at, user_id,
+        user_profiles!cars_user_id_fkey(display_name, slug)
+      `, { count: 'exact' })
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1)
-
-    if (owner) {
-      query = query.ilike('owner', `%${owner}%`)
-    }
     
     if (userId) {
       query = query.eq('user_id', userId)
     }
     
     if (q) {
-      query = query.or(`model.ilike.%${q}%,description.ilike.%${q}%,owner.ilike.%${q}%`)
+      query = query.or(`model.ilike.%${q}%,description.ilike.%${q}%`)
     }
     
     if (tag) {
@@ -62,7 +59,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    const cars = (data || []).map((row: DbCar) => {
+    const cars = (data || []).map((row: any) => {
       let imageUrl = ''
       if (row.image_url) {
         const { data: pub } = supabase.storage.from('garage').getPublicUrl(row.image_url)
@@ -84,11 +81,16 @@ export async function GET(req: Request) {
         })
       }
 
+      const profile = Array.isArray(row.user_profiles) ? row.user_profiles[0] : row.user_profiles;
+      const owner = profile?.display_name || 'Anonymous';
+      const driverSlug = profile?.slug || 'anonymous';
+
       return {
         id: row.id,
         model: row.model,
         year: row.year ?? undefined,
-        owner: row.owner || 'Anonymous',
+        owner,
+        driverSlug,
         imageUrl,
         description: row.description || '',
         specs,

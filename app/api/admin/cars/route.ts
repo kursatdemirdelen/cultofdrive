@@ -52,7 +52,10 @@ export async function GET(req: Request) {
 
   const { data, error } = await client
     .from('cars')
-    .select('*')
+    .select(`
+      id, model, year, user_id, image_url, description, specs, tags, is_featured, created_at,
+      user_profiles!cars_user_id_fkey(display_name)
+    `)
     .order('created_at', { ascending: false })
     .limit(limit)
 
@@ -60,7 +63,16 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  return NextResponse.json({ cars: data || [] })
+  const cars = (data || []).map((row: any) => {
+    const profile = Array.isArray(row.user_profiles) ? row.user_profiles[0] : row.user_profiles;
+    return {
+      ...row,
+      owner: profile?.display_name || null,
+      user_profiles: undefined
+    };
+  });
+
+  return NextResponse.json({ cars })
 }
 
 export async function POST(req: Request) {
@@ -108,7 +120,6 @@ export async function POST(req: Request) {
   const insertData: Record<string, any> = {
     model,
     year,
-    owner: String(payload.owner || '').trim() || null,
     description: description || null,
     image_url: String(payload.imageUrl || '').trim() || null,
     specs: normalizeSpecs(payload.specs),

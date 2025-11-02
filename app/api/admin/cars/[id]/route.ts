@@ -93,10 +93,6 @@ export async function PATCH(
     updates.year = year
   }
 
-  if (payload.owner !== undefined) {
-    updates.owner = payload.owner ? String(payload.owner).trim() : null
-  }
-
   if (payload.description !== undefined) {
     const description = String(payload.description || '').trim()
     if (description.length > 2000) {

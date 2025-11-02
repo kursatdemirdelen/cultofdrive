@@ -5,13 +5,13 @@ type DbCar = {
   id: string
   model: string
   year: number | null
-  owner: string | null
   image_url: string | null
   description: string | null
   specs: any[] | null
   tags: string[] | null
   is_featured: boolean | null
   created_at: string
+  user_id: string | null
 }
 
 export async function GET(
@@ -23,8 +23,9 @@ export async function GET(
     const { data, error } = await supabase
       .from('cars')
       .select(`
-        id, model, year, owner, image_url, description, specs, tags, is_featured, created_at,
-        car_views(count)
+        id, model, year, image_url, description, specs, tags, is_featured, created_at, user_id,
+        car_views(count),
+        user_profiles!cars_user_id_fkey(display_name, slug)
       `)
       .eq('id', id)
       .maybeSingle()
@@ -46,12 +47,16 @@ export async function GET(
       : []
 
     const viewCount = (data as any).car_views?.[0]?.count || 0;
+    const profile = Array.isArray((data as any).user_profiles) ? (data as any).user_profiles[0] : (data as any).user_profiles;
+    const owner = profile?.display_name || 'Anonymous';
+    const driverSlug = profile?.slug || 'anonymous';
 
     const car = {
       id: row.id,
       model: row.model,
       year: row.year ?? undefined,
-      owner: row.owner || 'Anonymous',
+      owner,
+      driverSlug,
       imageUrl: pub?.publicUrl || row.image_url || '',
       description: row.description || '',
       specs,
@@ -78,7 +83,6 @@ export async function PATCH(
     const updates: Record<string, any> = {}
     if (body.model !== undefined) updates.model = String(body.model)
     if (body.year !== undefined) updates.year = body.year ? Number(body.year) : null
-    if (body.owner !== undefined) updates.owner = body.owner || null
     if (body.description !== undefined) updates.description = body.description || null
     if (body.specs !== undefined) updates.specs = Array.isArray(body.specs) ? body.specs : []
     if (body.tags !== undefined) updates.tags = Array.isArray(body.tags) ? body.tags : []

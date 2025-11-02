@@ -1,6 +1,6 @@
 import { supabase } from '@/utils/supabase';
 import { NextResponse } from 'next/server';
-import type { Car } from '@/app/types/car';
+import type { Car } from '@/app/types';
 
 export async function POST(request: Request) {
   try {
@@ -12,24 +12,29 @@ export async function POST(request: Request) {
     const model = formData.get('model') as string | null;
     const yearStr = formData.get('year') as string | null;
     const year = yearStr ? parseInt(yearStr) : undefined;
-    const owner = (formData.get('owner') as string | null) || 'Anonymous';
     const description = formData.get('description') as string | null;
     const specsStr = formData.get('specs') as string | null;
     const specs = specsStr ? (JSON.parse(specsStr) as { key: string; value: string }[]) : [];
     const tagsStr = formData.get('tags') as string | null;
     const tags = tagsStr ? (JSON.parse(tagsStr) as string[]) : [];
-    const username = formData.get('username') as string | null;
     const user_id = (formData.get('user_id') as string | null) || null;
 
-    console.log('Parsed data:', { model, year, owner, description, specs, tags, username, user_id });
+    console.log('Parsed data:', { model, year, description, specs, tags, user_id });
 
     if (!file) return NextResponse.json({ error: 'Photo is required.' }, { status: 400 });
     if (!model) return NextResponse.json({ error: 'Model is required.' }, { status: 400 });
     if (!description) return NextResponse.json({ error: 'Description is required.' }, { status: 400 });
-    if (!username) return NextResponse.json({ error: 'Username is required.' }, { status: 400 });
+    if (!user_id) return NextResponse.json({ error: 'User authentication required.' }, { status: 401 });
 
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('display_name')
+      .eq('id', user_id)
+      .single();
+
+    const displayName = profile?.display_name || 'user';
     const buffer = Buffer.from(await file.arrayBuffer());
-    const fileName = `${username}-${Date.now()}.jpg`;
+    const fileName = `${displayName.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}.jpg`;
 
     console.log('Uploading file:', fileName);
     const { data: storageData, error: storageError } = await supabase.storage
@@ -45,7 +50,6 @@ export async function POST(request: Request) {
     const { error: dbError } = await supabase.from('cars').insert({
       model,
       year,
-      owner,
       image_url: storageData.path,
       description,
       specs,
