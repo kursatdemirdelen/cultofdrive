@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import type { Car } from "../types/car.types";
+import type { Car } from "@/app/types";
 import { UserCircle } from "lucide-react";
 
 interface CarCardProps {

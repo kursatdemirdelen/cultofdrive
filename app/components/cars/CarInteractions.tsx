@@ -5,11 +5,16 @@ import { CarsAPI } from "@/utils/api";
 import { supabaseBrowser } from "@/utils/supabase-browser";
 import { MessageCircle, Send, Trash2 } from "lucide-react";
 import Link from "next/link";
+import { Avatar } from "@/app/components/ui/Avatar";
 
 interface Comment {
   id: string;
   body: string;
   user_id: string | null;
+  user_email?: string;
+  display_name?: string;
+  avatar_url?: string;
+  slug?: string;
   created_at: string;
 }
 
@@ -78,13 +83,43 @@ export default function CarInteractions({ carId }: { carId: string }) {
     try {
       setPosting(true);
       setErr(null);
-      const { comment } = await CarsAPI.addComment(carId, commentBody.trim(), userId || undefined);
+      
+      // Get current user email
+      const { data: { user } } = await supabaseBrowser.auth.getUser();
+      
+      const { comment } = await CarsAPI.addComment(
+        carId, 
+        commentBody.trim(), 
+        userId || undefined
+      );
+      
       setComments((arr) => [comment, ...arr]);
       setCommentBody("");
     } catch (e: any) {
       setErr(e?.message || "Failed to add comment");
     } finally {
       setPosting(false);
+    }
+  }
+
+  async function deleteComment(commentId: string) {
+    try {
+      const { error, data } = await supabaseBrowser
+        .from("car_comments")
+        .delete()
+        .eq("id", commentId)
+        .eq("user_id", userId);
+      
+      if (error) {
+        console.error('Delete error:', error);
+        throw error;
+      }
+      
+      console.log('Delete result:', data);
+      setComments((arr) => arr.filter((c) => c.id !== commentId));
+    } catch (e: any) {
+      console.error('Delete failed:', e);
+      setErr(e?.message || "Failed to delete comment");
     }
   }
 
@@ -152,21 +187,46 @@ export default function CarInteractions({ carId }: { carId: string }) {
           <div className="space-y-2">
             {comments.map((c) => (
               <div key={c.id} className="group rounded-lg border border-white/10 bg-white/[0.03] p-3 transition hover:bg-white/[0.05]">
-                <p className="whitespace-pre-line text-sm leading-relaxed text-white/70">{c.body}</p>
-                <div className="mt-2 flex items-center justify-between">
-                  <p className="text-xs text-white/40">
-                    {new Date(c.created_at).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
-                  {c.user_id === userId && (
-                    <button className="opacity-0 transition group-hover:opacity-100 text-red-400/60 hover:text-red-400">
-                      <Trash2 className="h-3 w-3" />
-                    </button>
-                  )}
+                <div className="flex gap-3">
+                  <Avatar 
+                    src={c.avatar_url} 
+                    alt={c.display_name || c.user_email?.split('@')[0] || 'User'} 
+                    size="sm" 
+                  />
+                  <div className="flex-1">
+                    {(c.display_name || c.user_email) && c.slug && (
+                      <Link 
+                        href={`/driver/${c.slug}`}
+                        className="mb-1 inline-block text-xs font-medium text-white/60 hover:text-white transition"
+                      >
+                        {c.display_name || c.user_email?.split('@')[0]}
+                      </Link>
+                    )}
+                    {(c.display_name || c.user_email) && !c.slug && (
+                      <span className="mb-1 inline-block text-xs font-medium text-white/60">
+                        {c.display_name || c.user_email?.split('@')[0]}
+                      </span>
+                    )}
+                    <p className="whitespace-pre-line text-sm leading-relaxed text-white/70">{c.body}</p>
+                    <div className="mt-2 flex items-center justify-between">
+                      <p className="text-xs text-white/40">
+                        {new Date(c.created_at).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                      {c.user_id === userId && (
+                        <button 
+                          onClick={() => deleteComment(c.id)}
+                          className="opacity-0 transition group-hover:opacity-100 text-red-400/60 hover:text-red-400"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}

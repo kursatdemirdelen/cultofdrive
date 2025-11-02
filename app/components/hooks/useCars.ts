@@ -1,11 +1,10 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import type { Car } from "../types/car.types";
+import type { Car } from "@/app/types";
 
 type UseCarsParams = {
   q?: string;
-  owner?: string;
   tag?: string;
   userId?: string;
   limit?: number;
@@ -20,7 +19,7 @@ export function useCars(params?: UseCarsParams) {
   const queryKey = useMemo(() => 
     JSON.stringify(params || {}),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [params?.q, params?.owner, params?.tag, params?.userId, params?.limit, params?.featured]
+    [params?.q, params?.tag, params?.userId, params?.limit, params?.featured]
   );
 
   useEffect(() => {
@@ -32,7 +31,6 @@ export function useCars(params?: UseCarsParams) {
       try {
         const qs = new URLSearchParams();
         if (params?.q) qs.set("q", params.q);
-        if (params?.owner) qs.set("owner", params.owner);
         if (params?.tag) qs.set("tag", params.tag);
         if (params?.userId) qs.set("user_id", params.userId);
         if (params?.limit) qs.set("limit", String(params.limit));

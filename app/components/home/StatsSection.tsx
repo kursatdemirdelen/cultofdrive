@@ -23,9 +23,9 @@ export function StatsSection() {
   }, []);
 
   return (
-    <section className="px-4 py-12">
+    <section className="px-4 py-6 sm:py-12">
       <div className="mx-auto max-w-6xl">
-        <div className="grid gap-6 sm:grid-cols-3">
+        <div className="grid grid-cols-3 gap-3 sm:gap-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -33,8 +33,8 @@ export function StatsSection() {
             viewport={{ once: true }}
             className="text-center"
           >
-            <p className="mb-2 text-5xl font-light tabular-nums text-white">{stats.cars}</p>
-            <p className="text-sm text-white/50">Builds</p>
+            <p className="mb-1 text-4xl font-light tabular-nums text-white sm:mb-2 sm:text-5xl">{stats.cars}</p>
+            <p className="text-xs text-white/50 sm:text-sm">Builds</p>
           </motion.div>
 
           <motion.div
@@ -44,8 +44,8 @@ export function StatsSection() {
             viewport={{ once: true }}
             className="text-center"
           >
-            <p className="mb-2 text-5xl font-light tabular-nums text-white">{stats.views.toLocaleString()}</p>
-            <p className="text-sm text-white/50">Views</p>
+            <p className="mb-1 text-4xl font-light tabular-nums text-white sm:mb-2 sm:text-5xl">{stats.views.toLocaleString()}</p>
+            <p className="text-xs text-white/50 sm:text-sm">Views</p>
           </motion.div>
 
           <motion.div
@@ -55,8 +55,8 @@ export function StatsSection() {
             viewport={{ once: true }}
             className="text-center"
           >
-            <p className="mb-2 text-5xl font-light tabular-nums text-white">{stats.favorites}</p>
-            <p className="text-sm text-white/50">Favorites</p>
+            <p className="mb-1 text-4xl font-light tabular-nums text-white sm:mb-2 sm:text-5xl">{stats.favorites}</p>
+            <p className="text-xs text-white/50 sm:text-sm">Favorites</p>
           </motion.div>
         </div>
       </div>

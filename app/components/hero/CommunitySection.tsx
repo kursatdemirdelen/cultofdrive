@@ -15,22 +15,19 @@ const highlights = [
 
 export default function CommunitySection() {
   return (
-    <section id="community" className="mt-12">
-      <div className="mb-8 text-center">
-        <h2 className="text-3xl font-heading tracking-[0.12em] text-white">
+    <section id="community" className="mt-8 sm:mt-12">
+      <div className="mb-6 text-center sm:mb-8">
+        <h2 className="text-2xl font-heading tracking-[0.12em] text-white sm:text-3xl">
           What makes us different?
         </h2>
         <p className="mt-2 text-sm text-white/50">Built by enthusiasts, for enthusiasts</p>
       </div>
-      <div className="grid gap-6 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-3 sm:gap-6">
         {highlights.map((item, i) => (
           <div
             key={item.title}
-            className="group rounded-xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur-sm transition hover:bg-white/[0.04]"
+            className="group rounded-xl border border-white/10 bg-white/[0.02] p-4 backdrop-blur-sm transition hover:bg-white/[0.04] sm:p-6"
           >
-            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-lg font-light text-white/60">
-              {i + 1}
-            </div>
             <h3 className="mb-2 text-sm font-medium uppercase tracking-wider text-white">
               {item.title}
             </h3>

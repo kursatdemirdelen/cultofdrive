@@ -122,12 +122,12 @@ export default function AuthMenu({ user, onSignOut }: AuthMenuProps) {
               className="absolute right-0 z-50 mt-2 w-56 rounded-xl border border-white/10 bg-black/95 p-2 shadow-2xl backdrop-blur-xl"
             >
               <Link
-                href="/garage/mine"
+                href="/profile"
                 className="flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm text-white/80 transition hover:bg-white/10 hover:text-white"
                 role="menuitem"
                 onClick={() => setOpen(false)}
               >
-                <Car className="h-4 w-4" />
+                <UserIcon className="h-4 w-4" />
                 My Garage
               </Link>
               <Link
