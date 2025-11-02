@@ -86,11 +86,11 @@ export function ReportButton({ contentType, contentId }: Props) {
                     required
                     className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-2.5 text-white"
                   >
-                    <option value="">Select a reason</option>
-                    <option value="spam">Spam</option>
-                    <option value="inappropriate">Inappropriate content</option>
-                    <option value="misleading">Misleading information</option>
-                    <option value="other">Other</option>
+                    <option value="" className="bg-slate-900 text-white">Select a reason</option>
+                    <option value="spam" className="bg-slate-900 text-white">Spam</option>
+                    <option value="inappropriate" className="bg-slate-900 text-white">Inappropriate content</option>
+                    <option value="misleading" className="bg-slate-900 text-white">Misleading information</option>
+                    <option value="other" className="bg-slate-900 text-white">Other</option>
                   </select>
                 </div>
 

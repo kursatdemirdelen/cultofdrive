@@ -28,14 +28,14 @@ export function SpecInput({ specs, onChange, disabled }: Props) {
   return (
     <div className="space-y-3">
       {specs.map((spec, i) => (
-        <div key={i} className="flex gap-2">
+        <div key={i} className="flex flex-col gap-2 sm:flex-row">
           <input
             type="text"
             value={spec.key}
             onChange={(e) => updateSpec(i, "key", e.target.value)}
             placeholder="e.g., Engine"
             disabled={disabled}
-            className="w-1/3 rounded-lg border border-white/20 bg-white/5 px-4 py-2.5 text-white placeholder-white/40 transition focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 disabled:opacity-50"
+            className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-2.5 text-white placeholder-white/40 transition focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 disabled:opacity-50 sm:w-1/3"
           />
           <input
             type="text"
@@ -43,15 +43,15 @@ export function SpecInput({ specs, onChange, disabled }: Props) {
             onChange={(e) => updateSpec(i, "value", e.target.value)}
             placeholder="e.g., S54B32"
             disabled={disabled}
-            className="flex-1 rounded-lg border border-white/20 bg-white/5 px-4 py-2.5 text-white placeholder-white/40 transition focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 disabled:opacity-50"
+            className="w-full flex-1 rounded-lg border border-white/20 bg-white/5 px-4 py-2.5 text-white placeholder-white/40 transition focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/20 disabled:opacity-50"
           />
           <button
             type="button"
             onClick={() => removeSpec(i)}
             disabled={disabled}
-            className="rounded-lg border border-white/20 bg-white/5 px-3 text-white/60 transition hover:bg-red-500/10 hover:text-red-400 disabled:opacity-50"
+            className="self-start rounded-lg border border-white/20 bg-white/5 p-2.5 text-white/60 transition hover:bg-red-500/10 hover:text-red-400 disabled:opacity-50 sm:self-center"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
       ))}

@@ -36,12 +36,10 @@ export default function TopBar() {
       { href: "/marketplace", label: "Marketplace" },
     ];
 
-    if (user) {
-      base.push({ href: "/garage/mine", label: "My Garage" });
-    }
+
 
     return base;
-  }, [user]);
+  }, []);
 
   const handleSignOut = async () => {
     await supabaseBrowser.auth.signOut();
