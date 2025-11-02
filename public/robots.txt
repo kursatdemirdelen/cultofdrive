@@ -1,0 +1,10 @@
+# Cult of Drive - Robots.txt
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /garage/edit/
+Disallow: /marketplace/edit/
+
+# Sitemap
+Sitemap: https://cultofdrive.com/sitemap.xml

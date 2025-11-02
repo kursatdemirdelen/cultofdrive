@@ -8,3 +8,8 @@ declare namespace NodeJS {
     INSTAGRAM_APP_SECRET?: string
   }
 }
+
+declare module '*.css' {
+  const content: { [className: string]: string };
+  export default content;
+}
