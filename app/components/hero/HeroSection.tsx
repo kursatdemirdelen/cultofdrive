@@ -25,44 +25,66 @@ export default function HeroSection({ scrollToSection }: HeroSectionProps) {
   };
 
   return (
-    <div className="relative z-10 flex items-center justify-center bg-gradient-to-b from-gray-900 to-black px-4 pb-16 pt-12">
+    <div className="relative z-10 flex items-center justify-center px-4 py-16">
       <motion.div
-        initial={{ opacity: 0, y: 16 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="w-full max-w-6xl"
+        transition={{ duration: 0.8 }}
+        className="w-full max-w-7xl"
       >
-        <div className="overflow-hidden rounded-3xl border border-white/10 bg-black/60 shadow-glow backdrop-blur-lg">
-          <div className="grid gap-10 p-8 md:grid-cols-[1.1fr,0.9fr] md:p-12">
-            <div className="space-y-7">
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1 text-[11px] uppercase tracking-[0.38em] text-white/60">
-                Now live
-              </span>
-              <h1 className="text-4xl font-heading tracking-[0.16em] text-white md:text-5xl">
-                CULT OF DRIVE
-              </h1>
-              <p className="max-w-xl text-base leading-relaxed text-white/70 md:text-lg">
-                A curated garage for 90s&ndash;2000s BMW icons. Browse authentic builds, dive into detailed spec sheets, and add your own driver-focused BMW story to the community.
-              </p>
+        <div className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.02] p-8 backdrop-blur-sm md:p-12">
+          <div className="grid gap-12 md:grid-cols-2 md:gap-16">
+            <div className="flex flex-col justify-center space-y-8">
+              <div className="space-y-6">
+                <motion.span 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                  className="inline-block text-xs uppercase tracking-[0.3em] text-white/40"
+                >
+                  Now live
+                </motion.span>
+                <h1 className="text-6xl font-heading tracking-[0.12em] text-white md:text-7xl lg:text-8xl">
+                  CULT OF
+                  <br />
+                  DRIVE
+                </h1>
+                <p className="max-w-lg text-lg leading-relaxed text-white/60">
+                  A curated garage for 90s–2000s BMW icons. Browse authentic builds and share your driver-focused story.
+                </p>
+              </div>
 
-              <div className="flex flex-wrap gap-3">
-                <Link href="/garage" className={actionClasses}>
-                  <Car className="h-4 w-4 text-white/65" />
+              <div className="flex flex-wrap gap-4">
+                <Link 
+                  href="/garage" 
+                  className="group flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-6 py-3 text-sm font-medium uppercase tracking-wider text-white backdrop-blur-sm transition hover:bg-white/10"
+                >
+                  <Car className="h-4 w-4" />
                   Discover builds
                 </Link>
-                <Link href="/garage/add" className={actionClasses}>
-                  <Share2 className="h-4 w-4 text-white/65" />
+                <Link 
+                  href="/garage/add" 
+                  className="group flex items-center gap-2 rounded-lg border border-white/10 px-6 py-3 text-sm font-medium uppercase tracking-wider text-white/60 transition hover:border-white/20 hover:text-white"
+                >
+                  <Share2 className="h-4 w-4" />
                   Share your build
                 </Link>
               </div>
             </div>
 
-            <HeroImage />
+            <div className="flex items-center">
+              <HeroImage />
+            </div>
           </div>
 
-          <div className="px-8 pb-10 md:px-12">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="mt-8"
+          >
             <CommunitySection />
-          </div>
+          </motion.div>
         </div>
       </motion.div>
     </div>

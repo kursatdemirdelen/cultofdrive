@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useCars } from "../components/hooks/useCars";
 import { Search, Grid3x3, List, SlidersHorizontal, Star } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { CarGridSkeleton } from "../components/loading/CarCardSkeleton";
+import { CarListSkeleton } from "../components/loading/CarListSkeleton";
 
 type ViewMode = "grid" | "list";
 type SortMode = "newest" | "oldest" | "model";
@@ -20,8 +21,8 @@ export default function DiscoverPage() {
 
   const debouncedSearch = useDebounce(search, 400);
   const { cars, loading, error } = useCars({ 
-    q: debouncedSearch || undefined,
-    featured: showFeaturedOnly || undefined,
+    q: debouncedSearch,
+    featured: showFeaturedOnly ? true : undefined,
     limit: 50 
   });
 
@@ -37,20 +38,20 @@ export default function DiscoverPage() {
   }, [cars, sortMode]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-slate-950 px-4 py-12">
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 px-4 py-8">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="mb-2 font-heading text-4xl tracking-[0.12em] text-white md:text-5xl">
-            DISCOVER
+        <div className="mb-6">
+          <h1 className="mb-2 text-3xl font-light tracking-tight text-white sm:text-4xl md:text-5xl">
+            Discover
           </h1>
-          <p className="text-white/60">
-            Explore {cars.length} iconic BMW builds from the community
+          <p className="text-sm text-white/50">
+            {cars.length} builds from the community
           </p>
         </div>
 
         {/* Search & Filters */}
-        <div className="mb-8 space-y-4">
+        <div className="mb-5 space-y-3">
           <div className="flex flex-col gap-3 sm:flex-row">
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-white/40" />
@@ -58,19 +59,19 @@ export default function DiscoverPage() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search by model, owner, or description..."
-                className="w-full rounded-lg border border-white/20 bg-white/5 py-3 pl-12 pr-4 text-white placeholder-white/40 backdrop-blur transition focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
+                placeholder="Search builds..."
+                className="w-full rounded-lg border border-white/10 bg-white/[0.03] py-3 pl-12 pr-4 text-sm text-white placeholder-white/30 transition focus:border-white/20 focus:bg-white/[0.05] focus:outline-none"
               />
             </div>
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className={`flex items-center gap-2 rounded-lg border px-4 py-3 font-medium transition ${
+              className={`flex items-center gap-2 rounded-md border px-4 py-2.5 text-sm transition ${
                 showFilters
-                  ? "border-white/40 bg-white/10 text-white"
-                  : "border-white/20 bg-white/5 text-white/80 hover:bg-white/10"
+                  ? "border-white/20 bg-white/10 text-white"
+                  : "border-white/10 bg-white/[0.03] text-white/60 hover:bg-white/[0.06]"
               }`}
             >
-              <SlidersHorizontal className="h-5 w-5" />
+              <SlidersHorizontal className="h-4 w-4" />
               Filters
             </button>
           </div>
@@ -80,25 +81,25 @@ export default function DiscoverPage() {
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
-              className="rounded-lg border border-white/10 bg-white/5 p-4 backdrop-blur"
+              className="rounded-lg border border-white/10 bg-white/[0.02] p-3 backdrop-blur-sm"
             >
               <div className="flex flex-wrap gap-4">
                 <button
                   onClick={() => setShowFeaturedOnly(!showFeaturedOnly)}
-                  className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm transition ${
+                  className={`flex items-center gap-1.5 rounded-md border px-3 py-2 text-xs transition ${
                     showFeaturedOnly
-                      ? "border-yellow-500/40 bg-yellow-500/10 text-yellow-400"
-                      : "border-white/20 bg-white/5 text-white/70 hover:bg-white/10"
+                      ? "border-white/20 bg-white/10 text-white"
+                      : "border-white/10 bg-white/[0.03] text-white/60 hover:bg-white/[0.06]"
                   }`}
                 >
-                  <Star className={`h-4 w-4 ${showFeaturedOnly ? "fill-yellow-400" : ""}`} />
-                  Featured Only
+                  <Star className={`h-3.5 w-3.5 ${showFeaturedOnly ? "fill-white" : ""}`} />
+                  Featured
                 </button>
 
                 <select
                   value={sortMode}
                   onChange={(e) => setSortMode(e.target.value as SortMode)}
-                  className="rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm text-white backdrop-blur transition focus:border-white/40 focus:outline-none"
+                  className="rounded-md border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white transition focus:border-white/20 focus:outline-none"
                 >
                   <option value="newest" className="bg-slate-900 text-white">Newest First</option>
                   <option value="oldest" className="bg-slate-900 text-white">Oldest First</option>
@@ -110,36 +111,36 @@ export default function DiscoverPage() {
         </div>
 
         {/* View Toggle */}
-        <div className="mb-6 flex items-center justify-between">
-          <p className="text-sm text-white/60">
-            {loading ? "Loading..." : `${sortedCars.length} builds found`}
+        <div className="mb-4 flex items-center justify-between">
+          <p className="text-xs text-white/50">
+            {loading ? "Loading..." : `${sortedCars.length} builds`}
           </p>
-          <div className="flex gap-2">
+          <div className="flex gap-1">
             <button
               onClick={() => setViewMode("grid")}
-              className={`rounded-lg p-2 transition ${
+              className={`rounded-md p-2 transition ${
                 viewMode === "grid"
                   ? "bg-white/10 text-white"
-                  : "text-white/60 hover:bg-white/5 hover:text-white"
+                  : "text-white/40 hover:bg-white/[0.05] hover:text-white/60"
               }`}
             >
-              <Grid3x3 className="h-5 w-5" />
+              <Grid3x3 className="h-4 w-4" />
             </button>
             <button
               onClick={() => setViewMode("list")}
-              className={`rounded-lg p-2 transition ${
+              className={`rounded-md p-2 transition ${
                 viewMode === "list"
                   ? "bg-white/10 text-white"
-                  : "text-white/60 hover:bg-white/5 hover:text-white"
+                  : "text-white/40 hover:bg-white/[0.05] hover:text-white/60"
               }`}
             >
-              <List className="h-5 w-5" />
+              <List className="h-4 w-4" />
             </button>
           </div>
         </div>
 
         {/* Loading State */}
-        {loading && <CarGridSkeleton count={viewMode === "grid" ? 6 : 3} />}
+        {loading && (viewMode === "grid" ? <CarGridSkeleton count={6} /> : <CarListSkeleton count={6} />)}
 
         {/* Error State */}
         {!loading && error && (
@@ -150,19 +151,19 @@ export default function DiscoverPage() {
 
         {/* Cars Grid/List */}
         {!loading && !error && sortedCars.length === 0 && (
-          <div className="rounded-xl border border-dashed border-white/20 bg-white/5 p-12 text-center">
-            <p className="text-lg text-white/60">No builds found</p>
-            <p className="mt-2 text-sm text-white/40">Try adjusting your search or filters</p>
+          <div className="rounded-lg border border-white/10 bg-white/[0.02] p-8 text-center">
+            <p className="text-sm text-white/50">No builds found</p>
+            <p className="mt-1 text-xs text-white/40">Try adjusting your search</p>
           </div>
         )}
 
         {viewMode === "grid" ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {sortedCars.map((car, i) => (
               <Link
                 key={car.id}
                 href={`/cars/${car.id}`}
-                className="group overflow-hidden rounded-xl border border-white/10 bg-white/5 backdrop-blur transition hover:border-white/20 hover:bg-white/8"
+                className="group overflow-hidden rounded-lg border border-white/10 bg-white/[0.02] backdrop-blur-sm transition hover:bg-white/[0.04]"
               >
                 <div className="relative aspect-video overflow-hidden">
                   <Image
@@ -170,26 +171,28 @@ export default function DiscoverPage() {
                     alt={car.model}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    placeholder="blur"
+                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwABmX/9k="
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                   {car.isFeatured && (
-                    <div className="absolute right-3 top-3 rounded-full bg-black/60 p-2 backdrop-blur">
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                    <div className="absolute right-3 top-3 rounded-md bg-black/60 p-1.5 backdrop-blur-xl">
+                      <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
                     </div>
                   )}
                 </div>
-                <div className="p-5">
-                  <h3 className="mb-1 text-xl font-medium text-white">{car.model}</h3>
-                  <p className="text-sm text-white/60">
+                <div className="p-4">
+                  <h3 className="mb-1 text-base font-medium text-white">{car.model}</h3>
+                  <p className="text-xs text-white/50">
                     {car.year && `${car.year} • `}
                     {car.owner}
                   </p>
                   {car.tags && car.tags.length > 0 && (
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {car.tags.slice(0, 3).map((tag, idx) => (
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {car.tags.slice(0, 2).map((tag, idx) => (
                         <span
                           key={idx}
-                          className="rounded-full bg-white/10 px-2.5 py-1 text-xs text-white/70"
+                          className="rounded-md bg-white/[0.03] px-2 py-0.5 text-xs text-white/40"
                         >
                           {tag}
                         </span>
@@ -206,31 +209,33 @@ export default function DiscoverPage() {
               <Link
                 key={car.id}
                 href={`/cars/${car.id}`}
-                className="flex gap-4 rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur transition hover:border-white/20 hover:bg-white/8"
+                className="group flex gap-4 rounded-lg border border-white/10 bg-white/[0.02] p-3 backdrop-blur-sm transition hover:bg-white/[0.04]"
               >
                 <div className="relative h-24 w-32 flex-shrink-0 overflow-hidden rounded-lg">
                   <Image
-                    src={car.imageUrl}
+                    src={car.imageUrl.startsWith('public/') ? `/${car.imageUrl.replace('public/', '')}` : car.imageUrl}
                     alt={car.model}
                     fill
                     className="object-cover"
+                    placeholder="blur"
+                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwABmX/9k="
                     sizes="128px"
                   />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-start justify-between">
                     <div>
-                      <h3 className="text-lg font-medium text-white">{car.model}</h3>
-                      <p className="text-sm text-white/60">
+                      <h3 className="text-base font-medium text-white">{car.model}</h3>
+                      <p className="text-xs text-white/50">
                         {car.year && `${car.year} • `}
                         {car.owner}
                       </p>
                     </div>
                     {car.isFeatured && (
-                      <Star className="h-5 w-5 fill-yellow-400 text-yellow-400" />
+                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                     )}
                   </div>
-                  <p className="mt-2 line-clamp-2 text-sm text-white/50">{car.description}</p>
+                  <p className="mt-1 line-clamp-2 text-xs text-white/40">{car.description}</p>
                 </div>
               </Link>
             ))}
@@ -243,9 +248,11 @@ export default function DiscoverPage() {
 
 function useDebounce<T>(value: T, delay = 300) {
   const [v, setV] = useState(value);
-  useMemo(() => {
+  
+  useEffect(() => {
     const t = setTimeout(() => setV(value), delay);
     return () => clearTimeout(t);
   }, [value, delay]);
+  
   return v;
 }

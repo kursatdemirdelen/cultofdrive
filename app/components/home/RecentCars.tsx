@@ -11,20 +11,29 @@ export function RecentCars() {
 
   if (loading) {
     return (
-      <section className="bg-gradient-to-b from-gray-900 to-black px-4 py-16">
+      <section className="px-4 py-12">
         <div className="mx-auto max-w-6xl">
           <div className="mb-8 text-center">
             <h2 className="mb-2 font-heading text-3xl tracking-[0.12em] text-white">
               RECENT ADDITIONS
             </h2>
+            <div className="mx-auto mt-2 h-4 w-48 rounded bg-white/10 relative overflow-hidden">
+              <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+            </div>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="animate-pulse rounded-xl border border-white/10 bg-white/5">
-                <div className="aspect-video bg-white/10" />
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <div key={i} className="overflow-hidden rounded-xl border border-white/10 bg-white/[0.02] backdrop-blur-sm">
+                <div className="relative aspect-video overflow-hidden bg-white/10">
+                  <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+                </div>
                 <div className="p-4 space-y-2">
-                  <div className="h-5 w-3/4 rounded bg-white/10" />
-                  <div className="h-4 w-1/2 rounded bg-white/10" />
+                  <div className="h-5 w-3/4 rounded bg-white/10 relative overflow-hidden">
+                    <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+                  </div>
+                  <div className="h-4 w-1/2 rounded bg-white/10 relative overflow-hidden">
+                    <div className="absolute inset-0 -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+                  </div>
                 </div>
               </div>
             ))}
@@ -35,7 +44,7 @@ export function RecentCars() {
   }
 
   return (
-    <section className="bg-gradient-to-b from-gray-900 to-black px-4 py-16">
+      <section className="px-4 py-12">
       <div className="mx-auto max-w-6xl">
         <div className="mb-8 flex items-center justify-between">
           <div>
@@ -64,7 +73,7 @@ export function RecentCars() {
             >
               <Link
                 href={`/cars/${car.id}`}
-                className="group block overflow-hidden rounded-xl border border-white/10 bg-white/5 backdrop-blur transition hover:border-white/20"
+                className="group block overflow-hidden rounded-xl border border-white/10 bg-white/[0.02] backdrop-blur-sm transition hover:bg-white/[0.04]"
               >
                 <div className="relative aspect-video overflow-hidden">
                   <Image
@@ -72,6 +81,8 @@ export function RecentCars() {
                     alt={car.model}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    placeholder="blur"
+                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwABmX/9k="
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
                 </div>

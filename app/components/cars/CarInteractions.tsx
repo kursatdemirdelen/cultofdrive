@@ -91,16 +91,11 @@ export default function CarInteractions({ carId }: { carId: string }) {
   return (
     <div>
       {/* Comments Section */}
-      <section className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur">
+      <section className="rounded-lg border border-white/10 bg-black/40 p-6 backdrop-blur-sm">
         <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h3 className="mb-1 text-lg font-semibold text-white">Comments</h3>
-            <p className="text-sm text-white/60">
-              Share your thoughts about this build
-            </p>
-          </div>
-          <div className="flex items-center gap-2 text-sm text-white/60">
-            <MessageCircle className="h-4 w-4" />
+          <h3 className="text-xs font-medium uppercase tracking-wider text-white/40">Comments</h3>
+          <div className="flex items-center gap-1.5 text-xs text-white/50">
+            <MessageCircle className="h-3.5 w-3.5" />
             {comments.length}
           </div>
         </div>
@@ -113,65 +108,63 @@ export default function CarInteractions({ carId }: { carId: string }) {
 
         {canInteract ? (
           <div className="mb-6">
-            <textarea
-              value={commentBody}
-              onChange={(e) => setCommentBody(e.target.value)}
-              placeholder="What do you think about this build?"
-              rows={3}
-              className="w-full resize-none rounded-lg border border-white/20 bg-white/5 px-4 py-3 text-white placeholder-white/40 transition focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
-            />
-            <div className="mt-3 flex justify-end">
+            <div className="relative">
+              <textarea
+                value={commentBody}
+                onChange={(e) => setCommentBody(e.target.value)}
+                placeholder="Share your thoughts..."
+                rows={2}
+                className="w-full resize-none rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3 pr-12 text-sm text-white placeholder-white/30 transition focus:border-white/20 focus:bg-white/[0.05] focus:outline-none"
+              />
               <button
                 onClick={submitComment}
                 disabled={posting || !commentBody.trim()}
-                className="flex items-center gap-2 rounded-lg bg-white/10 px-5 py-2.5 font-medium text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-50"
+                className="absolute bottom-3 right-3 rounded-md bg-white/10 p-2 text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <Send className="h-4 w-4" />
-                {posting ? "Posting..." : "Post Comment"}
               </button>
             </div>
           </div>
         ) : (
-          <div className="mb-6 rounded-lg border border-dashed border-white/20 bg-white/5 p-4 text-center text-sm text-white/60">
-            <Link href="/auth" className="text-white underline hover:text-white/80">
+          <div className="mb-6 rounded-lg border border-white/10 bg-white/[0.03] p-3 text-center text-xs text-white/50">
+            <Link href="/auth" className="text-white/70 underline hover:text-white">
               Sign in
             </Link>{" "}
-            to join the discussion
+            to comment
           </div>
         )}
 
         {loading ? (
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="animate-pulse rounded-lg border border-white/10 bg-white/5 p-4">
-                <div className="mb-2 h-4 w-3/4 rounded bg-white/10" />
-                <div className="h-3 w-1/4 rounded bg-white/10" />
+          <div className="space-y-2">
+            {[1, 2].map((i) => (
+              <div key={i} className="animate-pulse rounded-lg border border-white/10 bg-white/[0.03] p-3">
+                <div className="mb-2 h-3 w-3/4 rounded bg-white/10" />
+                <div className="h-2 w-1/4 rounded bg-white/10" />
               </div>
             ))}
           </div>
         ) : comments.length === 0 ? (
-          <div className="rounded-lg border border-white/10 bg-white/5 p-8 text-center">
-            <MessageCircle className="mx-auto mb-3 h-8 w-8 text-white/40" />
-            <p className="text-sm text-white/60">No comments yet. Be the first to share your thoughts!</p>
+          <div className="rounded-lg border border-white/10 bg-white/[0.03] p-6 text-center">
+            <MessageCircle className="mx-auto mb-2 h-6 w-6 text-white/30" />
+            <p className="text-xs text-white/50">No comments yet</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-2">
             {comments.map((c) => (
-              <div key={c.id} className="rounded-lg border border-white/10 bg-white/5 p-4">
-                <p className="whitespace-pre-line text-sm leading-relaxed text-white/85">{c.body}</p>
-                <div className="mt-3 flex items-center justify-between">
-                  <p className="text-xs text-white/50">
+              <div key={c.id} className="group rounded-lg border border-white/10 bg-white/[0.03] p-3 transition hover:bg-white/[0.05]">
+                <p className="whitespace-pre-line text-sm leading-relaxed text-white/70">{c.body}</p>
+                <div className="mt-2 flex items-center justify-between">
+                  <p className="text-xs text-white/40">
                     {new Date(c.created_at).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
-                      year: "numeric",
                       hour: "2-digit",
                       minute: "2-digit",
                     })}
                   </p>
                   {c.user_id === userId && (
-                    <button className="text-xs text-red-400/60 hover:text-red-400">
-                      <Trash2 className="h-3.5 w-3.5" />
+                    <button className="opacity-0 transition group-hover:opacity-100 text-red-400/60 hover:text-red-400">
+                      <Trash2 className="h-3 w-3" />
                     </button>
                   )}
                 </div>

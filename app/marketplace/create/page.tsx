@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { supabaseBrowser } from "@/utils/supabase-browser";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, DollarSign, Car, Wrench } from "lucide-react";
 
 export default function CreateListingPage() {
@@ -196,7 +197,7 @@ export default function CreateListingPage() {
               />
               {imagePreview && (
                 <div className="mt-3 relative aspect-video w-full overflow-hidden rounded-lg">
-                  <img src={imagePreview} alt="Preview" className="h-full w-full object-cover" />
+                  <Image src={imagePreview} alt="Preview" fill className="object-cover" unoptimized />
                 </div>
               )}
             </div>

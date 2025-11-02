@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import type { Car } from "../types/car.types";
 
 type UseCarsParams = {
@@ -16,6 +16,12 @@ export function useCars(params?: UseCarsParams) {
   const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const queryKey = useMemo(() => 
+    JSON.stringify(params || {}),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [params?.q, params?.owner, params?.tag, params?.userId, params?.limit, params?.featured]
+  );
 
   useEffect(() => {
     const controller = new AbortController();
@@ -63,7 +69,8 @@ export function useCars(params?: UseCarsParams) {
     load();
 
     return () => controller.abort();
-  }, [params?.q, params?.owner, params?.tag, params?.userId, params?.limit, params?.featured]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryKey]);
 
   return { cars, loading, error };
 }

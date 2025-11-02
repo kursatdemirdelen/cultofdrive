@@ -5,6 +5,7 @@ import { supabaseBrowser } from "@/utils/supabase-browser";
 import Link from "next/link";
 import Image from "next/image";
 import { DollarSign, MapPin, Eye, Plus, Car, Wrench } from "lucide-react";
+import { MarketplaceGridSkeleton } from "../components/loading/MarketplaceSkeleton";
 
 type Listing = {
   id: string;
@@ -106,17 +107,7 @@ export default function MarketplacePage() {
         </div>
 
         {loading ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="animate-pulse rounded-xl border border-white/10 bg-white/5">
-                <div className="aspect-video bg-white/10" />
-                <div className="p-4 space-y-2">
-                  <div className="h-5 w-3/4 rounded bg-white/10" />
-                  <div className="h-4 w-1/2 rounded bg-white/10" />
-                </div>
-              </div>
-            ))}
-          </div>
+          <MarketplaceGridSkeleton count={6} />
         ) : listings.length === 0 ? (
           <div className="rounded-xl border border-dashed border-white/20 bg-white/5 p-12 text-center">
             <p className="text-lg text-white/60">No listings yet</p>
@@ -141,6 +132,8 @@ export default function MarketplacePage() {
                       alt={listing.title}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      placeholder="blur"
+                      blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwABmX/9k="
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                   ) : (

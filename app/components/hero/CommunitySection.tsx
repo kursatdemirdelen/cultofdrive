@@ -16,19 +16,25 @@ const highlights = [
 export default function CommunitySection() {
   return (
     <section id="community" className="mt-12">
-      <h2 className="text-center text-2xl font-heading tracking-[0.08em] text-white/90">
-        What makes Cult of Drive different?
-      </h2>
-      <div className="mt-6 grid gap-4 sm:grid-cols-3">
-        {highlights.map((item) => (
+      <div className="mb-8 text-center">
+        <h2 className="text-3xl font-heading tracking-[0.12em] text-white">
+          What makes us different?
+        </h2>
+        <p className="mt-2 text-sm text-white/50">Built by enthusiasts, for enthusiasts</p>
+      </div>
+      <div className="grid gap-6 sm:grid-cols-3">
+        {highlights.map((item, i) => (
           <div
             key={item.title}
-            className="rounded-lg border border-white/10 bg-white/5 px-4 py-5 text-left"
+            className="group rounded-xl border border-white/10 bg-white/[0.02] p-6 backdrop-blur-sm transition hover:bg-white/[0.04]"
           >
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-white/45">
+            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-lg font-light text-white/60">
+              {i + 1}
+            </div>
+            <h3 className="mb-2 text-sm font-medium uppercase tracking-wider text-white">
               {item.title}
-            </p>
-            <p className="mt-2 text-sm text-white/70">{item.body}</p>
+            </h3>
+            <p className="text-sm leading-relaxed text-white/60">{item.body}</p>
           </div>
         ))}
       </div>

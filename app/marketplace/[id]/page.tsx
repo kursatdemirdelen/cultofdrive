@@ -7,9 +7,14 @@ import { EditListingButton } from "@/app/components/marketplace/EditListingButto
 
 async function getListing(id: string) {
   const base = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-  const res = await fetch(`${base}/api/marketplace/${id}`, { cache: "no-store" });
-  if (!res.ok) return null;
-  return res.json();
+  try {
+    const res = await fetch(`${base}/api/marketplace/${id}`, { cache: "no-store" });
+    if (!res.ok) return null;
+    return res.json();
+  } catch (error) {
+    console.error("Error fetching listing:", error);
+    return null;
+  }
 }
 
 export default async function ListingDetailPage({ params }: { params: Promise<{ id: string }> }) {

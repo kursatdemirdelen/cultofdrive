@@ -22,7 +22,10 @@ export async function GET(
     const { id } = await ctx.params
     const { data, error } = await supabase
       .from('cars')
-      .select('id, model, year, owner, image_url, description, specs, tags, is_featured, created_at')
+      .select(`
+        id, model, year, owner, image_url, description, specs, tags, is_featured, created_at,
+        car_views(count)
+      `)
       .eq('id', id)
       .maybeSingle()
 
@@ -42,6 +45,8 @@ export async function GET(
         })
       : []
 
+    const viewCount = (data as any).car_views?.[0]?.count || 0;
+
     const car = {
       id: row.id,
       model: row.model,
@@ -53,6 +58,7 @@ export async function GET(
       tags: row.tags || [],
       isFeatured: Boolean(row.is_featured),
       created_at: row.created_at,
+      view_count: viewCount,
     }
 
     return NextResponse.json({ car })
