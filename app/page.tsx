@@ -6,6 +6,7 @@ import HeroSection from "./components/hero/HeroSection";
 import Footer from "./components/bottom-components/Footer";
 import { RecentCars } from "./components/home/RecentCars";
 import { StatsSection } from "./components/home/StatsSection";
+import { CommunitySection } from "./components/home/CommunitySection";
 
 export default function Home() {
   return (
@@ -16,6 +17,7 @@ export default function Home() {
         <DriversGarage />
       </section>
       <RecentCars />
+      <CommunitySection />
       <section id="social-feed">
         <SocialFeed />
       </section>

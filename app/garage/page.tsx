@@ -18,12 +18,13 @@ export default function DiscoverPage() {
   const [sortMode, setSortMode] = useState<SortMode>("newest");
   const [showFeaturedOnly, setShowFeaturedOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [displayCount, setDisplayCount] = useState(12);
 
   const debouncedSearch = useDebounce(search, 400);
   const { cars, loading, error } = useCars({ 
     q: debouncedSearch,
     featured: showFeaturedOnly ? true : undefined,
-    limit: 50 
+    limit: 200 
   });
 
   const sortedCars = useMemo(() => {
@@ -36,6 +37,16 @@ export default function DiscoverPage() {
       return sorted.sort((a, b) => a.model.localeCompare(b.model));
     }
   }, [cars, sortMode]);
+
+  const displayedCars = useMemo(() => {
+    return sortedCars.slice(0, displayCount);
+  }, [sortedCars, displayCount]);
+
+  const hasMore = displayCount < sortedCars.length;
+
+  const loadMore = () => {
+    setDisplayCount(prev => prev + 12);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 px-4 py-8">
@@ -159,7 +170,7 @@ export default function DiscoverPage() {
 
         {viewMode === "grid" ? (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {sortedCars.map((car, i) => (
+            {displayedCars.map((car, i) => (
               <Link
                 key={car.id}
                 href={`/cars/${car.id}`}
@@ -185,7 +196,20 @@ export default function DiscoverPage() {
                   <h3 className="mb-1 text-base font-medium text-white">{car.model}</h3>
                   <p className="text-xs text-white/50">
                     {car.year && `${car.year} • `}
-                    {car.owner}
+                    {car.driverSlug && car.driverSlug !== 'anonymous' ? (
+                      <span 
+                        className="hover:text-white transition cursor-pointer"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          window.location.href = `/driver/${car.driverSlug}`;
+                        }}
+                      >
+                        {car.owner}
+                      </span>
+                    ) : (
+                      <span className="cursor-default">{car.owner}</span>
+                    )}
                   </p>
                   {car.tags && car.tags.length > 0 && (
                     <div className="mt-2 flex flex-wrap gap-1.5">
@@ -205,7 +229,7 @@ export default function DiscoverPage() {
           </div>
         ) : (
           <div className="space-y-3">
-            {sortedCars.map((car) => (
+            {displayedCars.map((car) => (
               <Link
                 key={car.id}
                 href={`/cars/${car.id}`}
@@ -228,7 +252,20 @@ export default function DiscoverPage() {
                       <h3 className="text-base font-medium text-white">{car.model}</h3>
                       <p className="text-xs text-white/50">
                         {car.year && `${car.year} • `}
-                        {car.owner}
+                        {car.driverSlug && car.driverSlug !== 'anonymous' ? (
+                          <span 
+                            className="hover:text-white transition cursor-pointer"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              window.location.href = `/driver/${car.driverSlug}`;
+                            }}
+                          >
+                            {car.owner}
+                          </span>
+                        ) : (
+                          <span className="cursor-default">{car.owner}</span>
+                        )}
                       </p>
                     </div>
                     {car.isFeatured && (
@@ -239,6 +276,18 @@ export default function DiscoverPage() {
                 </div>
               </Link>
             ))}
+          </div>
+        )}
+
+        {/* Load More Button */}
+        {!loading && !error && hasMore && (
+          <div className="mt-8 flex justify-center">
+            <button
+              onClick={loadMore}
+              className="rounded-md border border-white/10 bg-white/[0.03] px-6 py-3 text-sm text-white transition hover:bg-white/[0.06]"
+            >
+              Load More ({sortedCars.length - displayCount} remaining)
+            </button>
           </div>
         )}
       </div>

@@ -14,7 +14,6 @@ type Spec = { key: string; value: string };
 export default function AddCarPage() {
   const [model, setModel] = useState("");
   const [year, setYear] = useState("");
-  const [owner, setOwner] = useState("");
   const [description, setDescription] = useState("");
   const [specs, setSpecs] = useState<Spec[]>([{ key: "Engine", value: "" }]);
   const [tags, setTags] = useState<string[]>([]);
@@ -57,7 +56,6 @@ export default function AddCarPage() {
       if (file) fd.set("image", file);
       fd.set("model", model);
       if (year) fd.set("year", year);
-      if (owner) fd.set("owner", owner);
       fd.set("description", description);
       
       const cleanedSpecs = specs.filter(s => s.key || s.value);
@@ -74,7 +72,7 @@ export default function AddCarPage() {
       setMessage("Your car has been added to the garage!");
       
       setTimeout(() => {
-        router.push("/garage/mine");
+        router.push("/profile");
       }, 1500);
     } catch (err: any) {
       setError(err?.message || "Unexpected error");
@@ -112,11 +110,11 @@ export default function AddCarPage() {
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-slate-950 px-4 py-12">
       <div className="mx-auto max-w-3xl">
         <Link
-          href="/garage/mine"
+          href="/profile"
           className="mb-6 inline-flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2 text-sm text-white/80 backdrop-blur transition hover:bg-white/10"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to My Garage
+          Back to Profile
         </Link>
 
         <div className="rounded-xl border border-white/10 bg-white/5 p-6 backdrop-blur md:p-8">
@@ -188,17 +186,6 @@ export default function AddCarPage() {
               </div>
             </div>
 
-            <div>
-              <label className="mb-2 block text-sm font-medium text-white/80">Owner</label>
-              <input
-                type="text"
-                value={owner}
-                onChange={(e) => setOwner(e.target.value)}
-                placeholder="Your name"
-                className="w-full rounded-lg border border-white/20 bg-white/5 px-4 py-2.5 text-white placeholder-white/40 transition focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/20"
-              />
-            </div>
-
             {/* Description */}
             <div>
               <label className="mb-2 block text-sm font-medium text-white/80">
@@ -262,7 +249,7 @@ export default function AddCarPage() {
                 {submitting ? "Adding..." : "Add to Garage"}
               </button>
               <Link
-                href="/garage/mine"
+                href="/profile"
                 className="rounded-lg border border-white/20 px-6 py-3 font-medium text-white/80 transition hover:bg-white/5"
               >
                 Cancel

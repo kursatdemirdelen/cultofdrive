@@ -37,18 +37,8 @@ export default async function CarDetailPage({ params }: { params: Promise<{ id: 
   const addedOn = car.created_at ? dateFormatter.format(new Date(car.created_at)) : null;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-slate-900 to-black pb-16">
+    <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 pb-16">
       <ViewTracker carId={id} />
-      {/* Back Button */}
-      <div className="mx-auto max-w-6xl px-4 pt-6 sm:px-6">
-        <Link
-          href="/garage"
-          className="group inline-flex items-center gap-2 text-sm text-white/60 transition hover:text-white"
-        >
-          <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-          Back
-        </Link>
-      </div>
 
       {/* Hero Image */}
       <section className="relative mx-auto w-full max-w-6xl px-4 pt-6 sm:px-6">
@@ -93,13 +83,20 @@ export default async function CarDetailPage({ params }: { params: Promise<{ id: 
                   </span>
                 )}
                 <span className="text-white/30">•</span>
-                <Link 
-                  href={`/driver/${encodeURIComponent(owner)}`}
-                  className="flex items-center gap-1.5 hover:text-white transition"
-                >
-                  <User className="h-3.5 w-3.5" />
-                  {owner}
-                </Link>
+                {car.driverSlug && car.driverSlug !== 'anonymous' ? (
+                  <Link 
+                    href={`/driver/${car.driverSlug}`}
+                    className="flex items-center gap-1.5 hover:text-white transition"
+                  >
+                    <User className="h-3.5 w-3.5" />
+                    {owner}
+                  </Link>
+                ) : (
+                  <span className="flex items-center gap-1.5">
+                    <User className="h-3.5 w-3.5" />
+                    {owner}
+                  </span>
+                )}
                 {car.view_count > 0 && (
                   <>
                     <span className="text-white/30">•</span>
@@ -118,10 +115,19 @@ export default async function CarDetailPage({ params }: { params: Promise<{ id: 
         </div>
         
         {/* Action Buttons */}
-        <div className="mt-4 flex items-center justify-end gap-2">
-          <FavoriteButton carId={id} />
-          <ShareButton carModel={car.model} carId={id} />
-          <ReportButton contentType="car" contentId={id} />
+        <div className="mt-4 flex items-center justify-between gap-2">
+          <Link
+            href="/garage"
+            className="group inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/70 backdrop-blur-sm transition hover:bg-white/[0.06] hover:text-white"
+          >
+            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
+            Back
+          </Link>
+          <div className="flex items-center gap-2">
+            <FavoriteButton carId={id} />
+            <ShareButton carModel={car.model} carId={id} />
+            <ReportButton contentType="car" contentId={id} />
+          </div>
         </div>
       </section>
 
@@ -171,12 +177,16 @@ export default async function CarDetailPage({ params }: { params: Promise<{ id: 
                 <div>
                   <dt className="text-xs text-white/50">Owner</dt>
                   <dd className="mt-1 text-base font-medium text-white">
-                    <Link 
-                      href={`/driver/${encodeURIComponent(owner)}`}
-                      className="hover:text-white/80 transition"
-                    >
-                      {owner}
-                    </Link>
+                    {car.driverSlug && car.driverSlug !== 'anonymous' ? (
+                      <Link 
+                        href={`/driver/${car.driverSlug}`}
+                        className="hover:text-white/80 transition"
+                      >
+                        {owner}
+                      </Link>
+                    ) : (
+                      <span>{owner}</span>
+                    )}
                   </dd>
                 </div>
                 {car.year && (
