@@ -1,173 +1,268 @@
 # 🚗 Cult of Drive
 
-> A curated digital garage celebrating 90s-2000s BMW icons. Share authentic builds, connect with enthusiasts, and preserve the stories that make these cars legendary.
+> A curated digital garage for 90s-2000s BMW enthusiasts. Share builds, connect with the community, and preserve automotive stories.
 
-![BMW E36](public/images/bmw-e36.png)
+---
 
-## ✨ Features
+## 🚀 Quick Start
 
-### Core Features
-- **Browse & Discover**: Curated BMW builds with advanced search and filtering
-- **My Garage**: Personal collection management for authenticated users
-- **Car Details**: Comprehensive pages with specs, images, and owner stories
-- **User Profiles**: Driver pages showcasing their builds and history
+```bash
+# Install dependencies
+npm install
 
-### Social Features
-- **Favorites**: Save and track your favorite builds
-- **Comments**: Engage with the community on car listings
-- **Notifications**: Real-time updates for favorites and comments
-- **Social Feed**: Community posts and updates
+# Start development server
+npm run dev
+```
 
-### Admin & Advanced
-- **Admin Dashboard**: Complete car management with analytics
-- **Marketplace**: Buy and sell BMW builds with inquiry system
-- **Moderation**: Content reporting and review system
-- **Analytics**: View tracking and engagement metrics
+Visit [http://localhost:3000](http://localhost:3000)
 
-## 🛠️ Tech Stack
+---
+
+## 📦 Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
-| Framework | Next.js 15 (App Router) + React 18 |
+| Framework | Next.js 15 + React 18 |
 | Language | TypeScript 5.2 |
 | Styling | Tailwind CSS 3.3 |
 | Animation | Framer Motion 10.16 |
 | Database | Supabase (PostgreSQL) |
 | Auth | Supabase Auth |
 | Storage | Supabase Storage |
-| Deployment | Vercel |
 
-## 🚀 Getting Started
+---
 
-### Prerequisites
-- Node.js 18+ and npm
-- Supabase account
-- Git
+## 🗄️ Database Setup
 
-### Installation
+Run this single SQL file in Supabase SQL Editor:
 
-1. **Clone the repository**
 ```bash
-git clone https://github.com/kursatdemirdelen/cultofdrive.git
-cd cultofdrive
+supabase/setup.sql
 ```
 
+This file includes:
+- Core tables (cars, comments, favorites)
+- User profiles with auto-sync
+- Analytics & notifications
+- Row Level Security (RLS)
+- Storage bucket
+- Indexes
+- Data migration
 
+---
 
-2. **Install dependencies**
-```bash
-npm install
+## 🌐 Routes
+
+### Public Pages
+```
+/                    Homepage
+/garage              Browse all cars
+/cars/[id]           Car detail page
+/driver/[slug]       Public driver profile
 ```
 
-3. **Set up environment variables**
-```bash
-cp env.example .env.local
+### Driver Pages
+```
+/auth                Sign in / Sign up
+/profile             Your profile + cars
+/profile/edit        Edit profile
+/garage/add          Add new car
 ```
 
-Edit `.env.local` with your Supabase credentials:
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-SUPABASE_URL=your_supabase_url
-SUPABASE_KEY=your_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=true
+### Admin
+```
+/admin               Admin dashboard
 ```
 
-4. **Set up the database**
-
-Run the SQL files in your Supabase SQL Editor in this order:
-```bash
-supabase/schema.sql
-supabase/notifications.sql
-supabase/analytics.sql
-supabase/moderation.sql
-supabase/marketplace.sql
-```
-
-5. **Start the development server**
-```bash
-npm run dev
-```
-
-Visit [http://localhost:3000](http://localhost:3000)
+---
 
 ## 📁 Project Structure
 
 ```
-cultofdrive/
-├── app/
-│   ├── admin/              # Admin dashboard
-│   ├── api/                # API routes
-│   ├── cars/[id]/         # Car detail pages
-│   ├── components/         # Shared components
-│   ├── driver/[owner]/    # User profile pages
-│   ├── garage/            # Garage management
-│   ├── marketplace/       # Marketplace features
-│   └── page.tsx           # Homepage
-├── public/                 # Static assets
-├── supabase/              # Database schemas
-├── utils/                 # Utility functions
-└── README.md
+app/
+├── api/                    # API routes
+│   ├── cars/              # Car operations
+│   ├── profiles/          # User profiles
+│   └── admin/             # Admin operations
+│
+├── components/            # React components
+│   ├── ui/               # Reusable UI (Avatar)
+│   ├── cars/             # Car features
+│   ├── hero/             # Homepage sections
+│   └── ...
+│
+├── (pages)/              # Next.js pages
+│   ├── garage/           # Browse & add cars
+│   ├── cars/[id]/        # Car detail
+│   ├── user/[slug]/      # Public profile
+│   ├── profile/          # Own profile
+│   └── admin/            # Admin panel
+│
+└── types/                # TypeScript types
+
+supabase/
+├── setup.sql            # Complete database setup
+└── archive/             # Old migration files
+utils/                   # Shared utilities
 ```
-
-## 🗄️ Database Schema
-
-The project uses 11 main tables:
-- `cars` - Car listings with specs and details
-- `car_images` - Multiple images per car
-- `car_views` - Analytics and view tracking
-- `favorites` - User favorites system
-- `car_comments` - Comments and discussions
-- `notifications` - Real-time notifications
-- `reports` - Content moderation
-- `marketplace_listings` - Marketplace listings
-- `marketplace_inquiries` - Buyer inquiries
-- `social_posts` - Social feed posts
-- `email_subscriptions` - Newsletter subscriptions
-
-## 🔑 Environment Variables
-
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL | Yes |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous key | Yes |
-| `SUPABASE_URL` | Server-side Supabase URL | Yes |
-| `SUPABASE_KEY` | Server-side Supabase key | Yes |
-| `SUPABASE_SERVICE_ROLE_KEY` | Admin operations key | Yes |
-| `NEXT_PUBLIC_SITE_URL` | Application base URL | Yes |
-| `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED` | Enable Google OAuth | No |
-| `SEED_SECRET` | Development seed data key | No |
-
-
-
-
-
-## 🛠️ Development
-
-```bash
-npm run dev          # Start dev server
-npm run build        # Production build
-npm run type-check   # Check types
-```
-
-
-
-
-
-## 🚢 Deployment
-
-Deploy to Vercel in minutes. Connect your GitHub repo, add environment variables, and you're live.
-
-## 🤝 Contributing
-
-Contributions welcome! Fork, create a feature branch, and submit a PR.
-
-## 🔐 Admin
-
-Visit `/admin` and enter your Supabase service role key to manage content.
 
 ---
 
-**Built with ❤️ for BMW enthusiasts**
+## 🔑 Environment Variables
+
+Create `.env.local`:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+---
+
+## 🎨 Key Features
+
+### User System
+- **Avatar System**: Upload profile pictures with fallback to initials
+- **Slug URLs**: Clean URLs like `/user/john-doe`
+- **Profile Pages**: Public profile vs own profile with edit
+
+### Car Management
+- **Browse & Search**: Filter by model, year, tags
+- **Favorites**: Save favorite builds
+- **Comments**: Discuss builds with avatars
+- **Analytics**: Track views and engagement
+
+### Social Features
+- **Comments**: Threaded discussions with user avatars
+- **Favorites**: Like and save builds
+- **Notifications**: Real-time updates
+- **Social Feed**: Community posts
+
+### Admin Panel
+- **Car Management**: CRUD operations
+- **User Management**: View and manage users
+- **Analytics**: Platform statistics
+- **Moderation**: Content reports
+
+---
+
+## 🗃️ Database Schema
+
+### Core Tables
+```sql
+user_profiles    # User data (display_name, slug, avatar_url, bio)
+cars             # Car listings (linked to user_profiles)
+car_comments     # Comments with user info
+favorites        # User favorites
+car_views        # View analytics
+notifications    # Real-time notifications
+social_posts     # Social feed
+```
+
+### Key Relationships
+```
+cars.user_id → user_profiles.id
+car_comments.user_id → user_profiles.id
+favorites.user_id → user_profiles.id
+```
+
+---
+
+## 🎯 Development Guidelines
+
+### File Naming
+- Pages: `page.tsx`
+- Components: `PascalCase.tsx`
+- Utils: `camelCase.ts`
+- API Routes: `route.ts`
+
+### Import Order
+```tsx
+// 1. React/Next.js
+import { useState } from "react";
+
+// 2. Third-party
+import { Car } from "lucide-react";
+
+// 3. Components
+import { Avatar } from "@/app/components/ui/Avatar";
+
+// 4. Utils
+import { supabaseBrowser } from "@/utils/supabase-browser";
+
+// 5. Types
+import type { Car } from "@/app/types";
+```
+
+### Styling
+- **Tailwind CSS only** (no CSS modules)
+- **Mobile-first** responsive design
+- **Consistent spacing** using Tailwind scale
+- **Color palette**: `white/[opacity]` for transparency
+
+---
+
+## 🔐 Authentication Flow
+
+```
+User Sign Up → Supabase Auth → user_profiles (auto-created)
+                                      ↓
+                              display_name, slug, avatar_url
+```
+
+---
+
+## 🚢 Deployment
+
+### Vercel (Recommended)
+1. Connect GitHub repository
+2. Add environment variables
+3. Deploy
+
+### Environment Variables (Production)
+```env
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY
+NEXT_PUBLIC_SITE_URL
+```
+
+---
+
+## 📝 Scripts
+
+```bash
+npm run dev          # Start development server
+npm run build        # Create production build
+npm run start        # Start production server
+npm run lint         # Run ESLint
+npm run type-check   # TypeScript check
+```
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/amazing`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing`)
+5. Open Pull Request
+
+---
+
+## 📄 License
+
+This project is open source and available under the MIT License.
+
+---
+
+## 🙏 Acknowledgments
+
+Built with ❤️ for BMW enthusiasts by the community.
+
+---
+
+**[Live Demo](https://cultofdrive.vercel.app)** • **[Report Bug](https://github.com/kursatdemirdelen/cultofdrive/issues)** • **[Request Feature](https://github.com/kursatdemirdelen/cultofdrive/issues)**

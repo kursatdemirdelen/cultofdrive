@@ -2,16 +2,19 @@
 
 ## Directory Architecture
 
-### Root Level
 ```
 cultofdrive/
-├── app/                    # Next.js App Router application
-├── public/                 # Static assets and data
-├── supabase/              # Database schema and migrations
-├── utils/                 # Shared utility functions
-├── .amazonq/              # AI assistant rules and memory bank
-└── config files           # TypeScript, Next.js, Tailwind configs
+├── app/                    # Next.js App Router
+├── supabase/              # Database schemas
+├── utils/                 # Utilities
+├── .amazonq/              # AI rules
+└── README.md              # Documentation
 ```
+
+## Terminology
+- **driver** - User/member of the community (UI term)
+- **owner** - Car owner (specific to car ownership context)
+- **user** - Backend/database term (user_id, user_profiles)
 
 ## Core Application Structure
 
@@ -32,11 +35,11 @@ app/
 │   └── types.ts          # Admin data types
 ├── auth/                  # Authentication pages
 ├── cars/[id]/            # Individual car detail pages
-├── driver/[owner]/       # User profile pages
+├── driver/[slug]/        # Driver profile pages
+├── profile/              # Own profile (redirects to driver)
 ├── feed/                 # Social feed functionality
 └── garage/               # Car collection management
     ├── add/              # Add new car form
-    ├── mine/             # Personal garage view
     └── page.tsx          # Public garage browser
 ```
 
@@ -98,6 +101,7 @@ components/
 
 ### Data Flow
 - **Supabase Integration**: Real-time database with authentication
+- **User Profiles**: Automatic sync with auth.users via trigger, display_name used for owner field
 - **Server-Side Rendering**: Optimized performance and SEO
 - **Client-Side Interactions**: Real-time updates and user actions
 - **Image Management**: Supabase storage with CDN optimization
@@ -106,18 +110,21 @@ components/
 
 ### Authentication Flow
 1. User authentication via Supabase Auth
-2. Session management in layout component
-3. Protected routes and admin access control
-4. Real-time user state across components
+2. Automatic user_profiles creation via database trigger
+3. Session management in layout component
+4. Protected routes and admin access control
+5. Real-time user state across components
 
 ### Data Management
-1. Server components fetch initial data
+1. Server components fetch initial data with user_profiles joins
 2. Client components handle user interactions
 3. Custom hooks manage complex state
 4. API routes handle mutations and uploads
+5. Owner field populated from user_profiles.display_name via foreign key
 
 ### Content Pipeline
-1. Admin creates/edits cars via dashboard
+1. Users/Admin create cars (user_id required for ownership)
 2. Images uploaded to Supabase storage
 3. Data stored in PostgreSQL with RLS policies
-4. Public pages render with optimized images and metadata
+4. Owner display name fetched from user_profiles via join
+5. Public pages render with optimized images and metadata
