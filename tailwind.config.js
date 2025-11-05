@@ -25,6 +25,11 @@ const config = {
       boxShadow: {
         glow: "0 0 15px rgba(255,255,255,0.05)",
       },
+      keyframes: {
+        shimmer: {
+          '100%': { transform: 'translateX(100%)' },
+        },
+      },
     },
   },
   plugins: [],

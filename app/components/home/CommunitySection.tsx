@@ -31,7 +31,30 @@ export function CommunitySection() {
     fetchDrivers()
   }, [])
 
-  if (loading) return null
+  if (loading) {
+    return (
+      <section className="px-4 py-12">
+        <div className="max-w-6xl mx-auto">
+          <div className="mb-8 text-center">
+            <h2 className="mb-2 font-heading text-3xl tracking-[0.12em] text-white">
+              TOP CONTRIBUTORS
+            </h2>
+            <p className="text-white/60">Drivers building the culture</p>
+          </div>
+          <div className="flex flex-wrap justify-center gap-6 sm:gap-8">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="flex flex-col items-center">
+                <div className="mb-2 h-16 w-16 animate-pulse rounded-full bg-white/10" />
+                <div className="mb-1 h-3 w-16 animate-pulse rounded bg-white/10" />
+                <div className="h-2 w-12 animate-pulse rounded bg-white/10" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
   if (drivers.length === 0) return null
 
   return (
