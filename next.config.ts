@@ -2,7 +2,6 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ["scontent.cdninstagram.com", "lpibrmefgocqwaoxawaq.supabase.co"],
     qualities: [75, 85, 90, 95, 100],
     formats: ["image/avif", "image/webp"],
     deviceSizes: [320, 480, 640, 768, 1024, 1280, 1536, 1920],

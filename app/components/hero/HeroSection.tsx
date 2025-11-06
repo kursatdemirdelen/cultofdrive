@@ -40,8 +40,12 @@ export default function HeroSection({ scrollToSection }: HeroSectionProps) {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.2 }}
-                  className="inline-block text-xs uppercase tracking-[0.3em] text-white/40"
+                  className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-white/40"
                 >
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+                  </span>
                   Now live
                 </motion.span>
                 <h1 className="text-6xl font-heading tracking-[0.12em] text-white md:text-7xl lg:text-8xl">
