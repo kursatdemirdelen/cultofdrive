@@ -7,6 +7,7 @@ import { Avatar } from "@/app/components/ui/Avatar";
 import { Edit, Car, Eye, Heart, MessageCircle, Plus } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { EmptyState } from "@/app/components/ui/EmptyState";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -147,18 +148,15 @@ export default function ProfilePage() {
           </div>
 
           {cars.length === 0 ? (
-            <div className="rounded-xl border border-white/10 bg-white/5 p-12 text-center backdrop-blur">
-              <Car className="mx-auto mb-4 h-12 w-12 text-white/30" />
-              <p className="mb-2 text-white/70">No builds yet</p>
-              <p className="mb-4 text-sm text-white/50">Start building your garage</p>
-              <Link
-                href="/garage/add"
-                className="inline-flex items-center gap-2 rounded-lg bg-white/10 px-6 py-3 text-white transition hover:bg-white/20"
-              >
-                <Plus className="h-4 w-4" />
-                Add Your First Car
-              </Link>
-            </div>
+            <EmptyState
+              icon={Car}
+              title="No builds yet"
+              description="Start building your garage and share your story"
+              action={{
+                label: "Add Your First Car",
+                onClick: () => router.push("/garage/add"),
+              }}
+            />
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {cars.map((car) => (

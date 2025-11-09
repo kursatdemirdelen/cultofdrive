@@ -64,9 +64,15 @@ components/
 ├── cars/               # Car display and interaction
 ├── drivers-garage/     # User garage components
 ├── hero/               # Homepage hero section
+├── home/               # Homepage sections (stats, community, recent)
 ├── hooks/              # Custom React hooks
+├── loading/            # Skeleton loaders
 ├── nav/                # Navigation components
 ├── social-feed/        # Community feed components
+├── ui/                 # Reusable UI components
+│   ├── Avatar.tsx      # User avatar component
+│   ├── Toast.tsx       # Toast notification system
+│   └── EmptyState.tsx  # Empty state component
 └── types/              # Shared TypeScript types
 ```
 

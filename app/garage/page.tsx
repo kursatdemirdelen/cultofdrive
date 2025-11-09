@@ -8,6 +8,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { CarGridSkeleton } from "../components/loading/CarCardSkeleton";
 import { CarListSkeleton } from "../components/loading/CarListSkeleton";
+import { EmptyState } from "../components/ui/EmptyState";
 
 type ViewMode = "grid" | "list";
 type SortMode = "newest" | "oldest" | "model";
@@ -162,10 +163,11 @@ export default function DiscoverPage() {
 
         {/* Cars Grid/List */}
         {!loading && !error && sortedCars.length === 0 && (
-          <div className="rounded-lg border border-white/10 bg-white/[0.02] p-8 text-center">
-            <p className="text-sm text-white/50">No builds found</p>
-            <p className="mt-1 text-xs text-white/40">Try adjusting your search</p>
-          </div>
+          <EmptyState
+            icon={Search}
+            title="No builds found"
+            description="Try adjusting your search or filters"
+          />
         )}
 
         {viewMode === "grid" ? (

@@ -5,6 +5,7 @@ import { Heart } from "lucide-react";
 import { CarsAPI } from "@/utils/api";
 import { supabaseBrowser } from "@/utils/supabase-browser";
 import Link from "next/link";
+import { toast } from "@/app/components/ui/Toast";
 
 type Props = {
   carId: string;
@@ -57,11 +58,15 @@ export function FavoriteButton({ carId }: Props) {
         await CarsAPI.unfavorite(carId, userId);
         setFavorited(false);
         setFavoriteCount((c) => Math.max(0, c - 1));
+        toast.info("Removed from favorites");
       } else {
         await CarsAPI.favorite(carId, userId);
         setFavorited(true);
         setFavoriteCount((c) => c + 1);
+        toast.success("Added to favorites!");
       }
+    } catch (error) {
+      toast.error("Failed to update favorite");
     } finally {
       setFavoriting(false);
     }

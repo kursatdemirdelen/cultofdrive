@@ -148,3 +148,26 @@ function normalizeTags(input: unknown): string[] {
 - **Shared Components**: Extract reusable UI elements
 - **Type Definitions**: Centralize types in dedicated files
 - **Utility Functions**: Create focused, single-purpose utilities
+
+## UI Patterns
+
+### Toast Notifications
+- **Usage**: Import from `@/app/components/ui/Toast`
+- **Types**: `toast.success()`, `toast.error()`, `toast.info()`
+- **Auto-dismiss**: 3 seconds with manual close option
+- **Placement**: Top-right corner with stack support
+- **Example**: `toast.success("Added to favorites!")`
+
+### Empty States
+- **Component**: `EmptyState` from `@/app/components/ui/EmptyState`
+- **Props**: icon, title, description (optional), action (optional)
+- **Consistent Styling**: Matches app design system
+- **Example**: 
+```typescript
+<EmptyState
+  icon={MessageCircle}
+  title="No comments yet"
+  description="Be the first to share your thoughts!"
+  action={{ label: "Add Comment", onClick: handleAction }}
+/>
+```

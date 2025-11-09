@@ -1,3 +1,5 @@
+![BMW E36](public/images/bmw-e36.png)
+
 # 🚗 Cult of Drive
 
 > A curated digital garage for 90s-2000s BMW enthusiasts. Share builds, connect with the community, and preserve automotive stories.
@@ -86,9 +88,11 @@ app/
 │   └── admin/             # Admin operations
 │
 ├── components/            # React components
-│   ├── ui/               # Reusable UI (Avatar)
+│   ├── ui/               # Reusable UI (Avatar, Toast, EmptyState)
 │   ├── cars/             # Car features
 │   ├── hero/             # Homepage sections
+│   ├── home/             # Homepage components
+│   ├── loading/          # Skeleton loaders
 │   └── ...
 │
 ├── (pages)/              # Next.js pages
@@ -136,9 +140,15 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
 ### Social Features
 - **Comments**: Threaded discussions with user avatars
-- **Favorites**: Like and save builds
+- **Favorites**: Like and save builds with toast feedback
 - **Notifications**: Real-time updates
 - **Social Feed**: Community posts
+
+### UI Components
+- **Toast Notifications**: Success, error, and info messages
+- **Empty States**: Consistent empty state design
+- **Skeleton Loaders**: Loading states for better UX
+- **Live Indicator**: Animated green dot on "Now Live" badge
 
 ### Admin Panel
 - **Car Management**: CRUD operations

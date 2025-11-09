@@ -6,6 +6,8 @@ import { supabaseBrowser } from "@/utils/supabase-browser";
 import { MessageCircle, Send, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { Avatar } from "@/app/components/ui/Avatar";
+import { toast } from "@/app/components/ui/Toast";
+import { EmptyState } from "@/app/components/ui/EmptyState";
 
 interface Comment {
   id: string;
@@ -95,6 +97,7 @@ export default function CarInteractions({ carId }: { carId: string }) {
       
       setComments((arr) => [comment, ...arr]);
       setCommentBody("");
+      toast.success("Comment added!");
     } catch (e: any) {
       setErr(e?.message || "Failed to add comment");
     } finally {
@@ -117,6 +120,7 @@ export default function CarInteractions({ carId }: { carId: string }) {
       
       console.log('Delete result:', data);
       setComments((arr) => arr.filter((c) => c.id !== commentId));
+      toast.info("Comment deleted");
     } catch (e: any) {
       console.error('Delete failed:', e);
       setErr(e?.message || "Failed to delete comment");
@@ -179,10 +183,11 @@ export default function CarInteractions({ carId }: { carId: string }) {
             ))}
           </div>
         ) : comments.length === 0 ? (
-          <div className="rounded-lg border border-white/10 bg-white/[0.03] p-6 text-center">
-            <MessageCircle className="mx-auto mb-2 h-6 w-6 text-white/30" />
-            <p className="text-xs text-white/50">No comments yet</p>
-          </div>
+          <EmptyState
+            icon={MessageCircle}
+            title="No comments yet"
+            description="Be the first to share your thoughts!"
+          />
         ) : (
           <div className="space-y-2">
             {comments.map((c) => (
