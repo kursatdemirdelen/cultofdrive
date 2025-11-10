@@ -9,6 +9,8 @@ import { motion } from "framer-motion";
 import { CarGridSkeleton } from "../components/loading/CarCardSkeleton";
 import { CarListSkeleton } from "../components/loading/CarListSkeleton";
 import { EmptyState } from "../components/ui/EmptyState";
+import { NewBadge } from "../components/ui/NewBadge";
+import { isNew } from "@/utils/date";
 
 type ViewMode = "grid" | "list";
 type SortMode = "newest" | "oldest" | "model";
@@ -188,11 +190,14 @@ export default function DiscoverPage() {
                     blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwABmX/9k="
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   />
-                  {car.isFeatured && (
-                    <div className="absolute right-3 top-3 rounded-md bg-black/60 p-1.5 backdrop-blur-xl">
-                      <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                    </div>
-                  )}
+                  <div className="absolute right-3 top-3 flex gap-2">
+                    {car.created_at && isNew(car.created_at) && <NewBadge />}
+                    {car.isFeatured && (
+                      <div className="rounded-md bg-black/60 p-1.5 backdrop-blur-xl">
+                        <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div className="p-4">
                   <h3 className="mb-1 text-base font-medium text-white">{car.model}</h3>
@@ -270,9 +275,12 @@ export default function DiscoverPage() {
                         )}
                       </p>
                     </div>
-                    {car.isFeatured && (
-                      <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                    )}
+                    <div className="flex items-center gap-2">
+                      {car.created_at && isNew(car.created_at) && <NewBadge />}
+                      {car.isFeatured && (
+                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                      )}
+                    </div>
                   </div>
                   <p className="mt-1 line-clamp-2 text-xs text-white/40">{car.description}</p>
                 </div>

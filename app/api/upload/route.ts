@@ -2,6 +2,11 @@ import { supabase } from '@/utils/supabase';
 import { NextResponse } from 'next/server';
 import type { Car } from '@/app/types';
 
+export const runtime = 'nodejs';
+export const maxDuration = 60;
+
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
 export async function POST(request: Request) {
   try {
     console.log('Request received:', new Date().toISOString());
@@ -22,6 +27,9 @@ export async function POST(request: Request) {
     console.log('Parsed data:', { model, year, description, specs, tags, user_id });
 
     if (!file) return NextResponse.json({ error: 'Photo is required.' }, { status: 400 });
+    if (file.size > MAX_FILE_SIZE) {
+      return NextResponse.json({ error: 'Image too large. Maximum size is 5MB.' }, { status: 400 });
+    }
     if (!model) return NextResponse.json({ error: 'Model is required.' }, { status: 400 });
     if (!description) return NextResponse.json({ error: 'Description is required.' }, { status: 400 });
     if (!user_id) return NextResponse.json({ error: 'User authentication required.' }, { status: 401 });

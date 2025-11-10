@@ -26,6 +26,44 @@ export default function AddCarPage() {
   const router = useRouter();
   const previewUrl = useMemo(() => (file ? URL.createObjectURL(file) : null), [file]);
 
+  const compressImage = async (file: File): Promise<File> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = document.createElement('img');
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+          const maxSize = 1600;
+          
+          if (width > height && width > maxSize) {
+            height = (height * maxSize) / width;
+            width = maxSize;
+          } else if (height > maxSize) {
+            width = (width * maxSize) / height;
+            height = maxSize;
+          }
+          
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d')!;
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          canvas.toBlob((blob) => {
+            if (blob) {
+              resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+            } else {
+              resolve(file);
+            }
+          }, 'image/jpeg', 0.8);
+        };
+        img.src = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
   useEffect(() => {
     let mounted = true;
     supabaseBrowser.auth.getUser().then(({ data }) => {
@@ -50,7 +88,21 @@ export default function AddCarPage() {
 
     try {
       const fd = new FormData();
-      if (file) fd.set("image", file);
+      if (file) {
+        const MAX_SIZE = 4 * 1024 * 1024; // 4MB to be safe
+        let imageFile = file;
+        
+        if (file.size > 500 * 1024) { // Compress if > 500KB
+          toast.info("Optimizing image...");
+          imageFile = await compressImage(file);
+        }
+        
+        if (imageFile.size > MAX_SIZE) {
+          throw new Error("Image too large. Please use a smaller image (max 4MB).");
+        }
+        
+        fd.set("image", imageFile);
+      }
       fd.set("model", model);
       if (year) fd.set("year", year);
       fd.set("description", description);
@@ -140,6 +192,7 @@ export default function AddCarPage() {
                 <label className="flex h-48 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-white/20 bg-white/5 transition hover:border-white/40 hover:bg-white/8">
                   <Upload className="mb-2 h-8 w-8 text-white/40" />
                   <span className="text-sm text-white/60">Click to upload image</span>
+                  <span className="text-xs text-white/40">Max 5MB</span>
                   <input
                     type="file"
                     accept="image/*"

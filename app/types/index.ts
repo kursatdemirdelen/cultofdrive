@@ -11,7 +11,7 @@ export interface Car {
   specs: string[];
   tags: string[];
   isFeatured?: boolean;
-  created_at?: string;
+  created_at: string;
   view_count?: number;
 }
 
