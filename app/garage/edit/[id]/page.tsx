@@ -8,6 +8,7 @@ import { ArrowLeft, Save } from "lucide-react";
 import Image from "next/image";
 import { TagInput } from "@/app/components/form/TagInput";
 import { SpecInput } from "@/app/components/form/SpecInput";
+import { toast } from "@/app/components/ui/Toast";
 
 type Spec = { key: string; value: string };
 
@@ -16,8 +17,6 @@ export default function EditCarPage({ params }: { params: Promise<{ id: string }
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
 
   const [model, setModel] = useState("");
   const [year, setYear] = useState("");
@@ -70,7 +69,7 @@ export default function EditCarPage({ params }: { params: Promise<{ id: string }
         setTags(Array.isArray(car.tags) ? car.tags : []);
         setImageUrl(car.imageUrl || "");
       } catch (err: any) {
-        setError(err.message);
+        toast.error(err.message);
       } finally {
         setLoading(false);
       }
@@ -82,13 +81,11 @@ export default function EditCarPage({ params }: { params: Promise<{ id: string }
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!user) {
-      setError("You must be signed in to edit");
+      toast.error("You must be signed in to edit");
       return;
     }
 
     setSaving(true);
-    setError(null);
-    setMessage(null);
 
     try {
       const cleanedSpecs = specs.filter(s => s.key || s.value);
@@ -113,10 +110,10 @@ export default function EditCarPage({ params }: { params: Promise<{ id: string }
         throw new Error(data.error || "Failed to update");
       }
 
-      setMessage("Car updated successfully!");
-      setTimeout(() => router.push(`/cars/${id}`), 1500);
+      toast.success("Car updated successfully!");
+      router.push(`/cars/${id}`);
     } catch (err: any) {
-      setError(err.message);
+      toast.error(err.message);
     } finally {
       setSaving(false);
     }
@@ -236,18 +233,6 @@ export default function EditCarPage({ params }: { params: Promise<{ id: string }
                 disabled={saving}
               />
             </div>
-
-            {error && (
-              <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-red-200">
-                {error}
-              </div>
-            )}
-
-            {message && (
-              <div className="rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3 text-green-200">
-                {message}
-              </div>
-            )}
 
             <div className="flex gap-3">
               <button

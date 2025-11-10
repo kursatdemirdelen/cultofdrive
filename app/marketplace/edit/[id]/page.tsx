@@ -6,14 +6,13 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, Save, DollarSign, Car, Wrench } from "lucide-react";
+import { toast } from "@/app/components/ui/Toast";
 
 export default function EditListingPage({ params }: { params: Promise<{ id: string }> }) {
   const [id, setId] = useState("");
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
 
   const [listingType, setListingType] = useState<"car" | "part">("car");
   const [title, setTitle] = useState("");
@@ -64,7 +63,7 @@ export default function EditListingPage({ params }: { params: Promise<{ id: stri
           setImagePreview(url);
         }
       } catch (err: any) {
-        setError(err.message || "Failed to load listing");
+        toast.error(err.message || "Failed to load listing");
       } finally {
         setLoading(false);
       }
@@ -84,7 +83,6 @@ export default function EditListingPage({ params }: { params: Promise<{ id: stri
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    setError(null);
 
     try {
       let imageUrl = currentImageUrl;
@@ -120,10 +118,10 @@ export default function EditListingPage({ params }: { params: Promise<{ id: stri
 
       if (updateError) throw updateError;
 
-      setMessage("Listing updated successfully!");
-      setTimeout(() => router.push(`/marketplace/${id}`), 1500);
+      toast.success("Listing updated successfully!");
+      router.push(`/marketplace/${id}`);
     } catch (err: any) {
-      setError(err.message || "Failed to update listing");
+      toast.error(err.message || "Failed to update listing");
     } finally {
       setSubmitting(false);
       setUploading(false);
@@ -291,18 +289,6 @@ export default function EditListingPage({ params }: { params: Promise<{ id: stri
                 />
               </div>
             </div>
-
-            {error && (
-              <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-red-200">
-                {error}
-              </div>
-            )}
-
-            {message && (
-              <div className="rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3 text-green-200">
-                {message}
-              </div>
-            )}
 
             <div className="flex gap-3">
               <button

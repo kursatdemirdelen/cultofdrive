@@ -8,6 +8,7 @@ import { Upload, X, Plus, ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { TagInput } from "@/app/components/form/TagInput";
 import { SpecInput } from "@/app/components/form/SpecInput";
+import { toast } from "@/app/components/ui/Toast";
 
 type Spec = { key: string; value: string };
 
@@ -19,8 +20,6 @@ export default function AddCarPage() {
   const [tags, setTags] = useState<string[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
 
@@ -48,8 +47,6 @@ export default function AddCarPage() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    setError(null);
-    setMessage(null);
 
     try {
       const fd = new FormData();
@@ -69,13 +66,10 @@ export default function AddCarPage() {
       
       if (!res.ok) throw new Error(data?.error || "Failed to upload");
       
-      setMessage("Your car has been added to the garage!");
-      
-      setTimeout(() => {
-        router.push("/profile");
-      }, 1500);
+      toast.success("Your car has been added to the garage!");
+      router.push("/profile");
     } catch (err: any) {
-      setError(err?.message || "Unexpected error");
+      toast.error(err?.message || "Unexpected error");
     } finally {
       setSubmitting(false);
     }
@@ -223,19 +217,6 @@ export default function AddCarPage() {
                 disabled={submitting}
               />
             </div>
-
-            {/* Messages */}
-            {error && (
-              <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-red-200">
-                {error}
-              </div>
-            )}
-
-            {message && (
-              <div className="rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3 text-green-200">
-                {message}
-              </div>
-            )}
 
             {/* Submit */}
             <div className="flex gap-3">

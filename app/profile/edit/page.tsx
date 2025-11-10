@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Avatar } from "@/app/components/ui/Avatar";
 import { Camera, Save, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { toast } from "@/app/components/ui/Toast";
 
 export default function EditProfilePage() {
   const router = useRouter();
@@ -17,7 +18,6 @@ export default function EditProfilePage() {
     bio: "",
     avatar_url: "",
   });
-  const [error, setError] = useState("");
 
   useEffect(() => {
     async function loadProfile() {
@@ -53,7 +53,6 @@ export default function EditProfilePage() {
 
     try {
       setUploading(true);
-      setError("");
 
       const { data: { user } } = await supabaseBrowser.auth.getUser();
       if (!user) throw new Error("Not authenticated");
@@ -73,8 +72,9 @@ export default function EditProfilePage() {
         .getPublicUrl(filePath);
 
       setProfile((prev) => ({ ...prev, avatar_url: publicUrl }));
+      toast.success("Avatar uploaded!");
     } catch (err: any) {
-      setError(err.message || "Failed to upload avatar");
+      toast.error(err.message || "Failed to upload avatar");
     } finally {
       setUploading(false);
     }
@@ -83,7 +83,6 @@ export default function EditProfilePage() {
   async function handleSave() {
     try {
       setSaving(true);
-      setError("");
 
       const { data: { user } } = await supabaseBrowser.auth.getUser();
       if (!user) throw new Error("Not authenticated");
@@ -99,9 +98,10 @@ export default function EditProfilePage() {
 
       if (updateError) throw updateError;
 
+      toast.success("Profile updated!");
       router.push("/profile");
     } catch (err: any) {
-      setError(err.message || "Failed to save profile");
+      toast.error(err.message || "Failed to save profile");
     } finally {
       setSaving(false);
     }
@@ -128,12 +128,6 @@ export default function EditProfilePage() {
 
         <div className="rounded-xl border border-white/10 bg-white/5 p-6 sm:p-8 backdrop-blur">
           <h1 className="mb-6 text-2xl font-light text-white">Edit Profile</h1>
-
-          {error && (
-            <div className="mb-6 rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-200">
-              {error}
-            </div>
-          )}
 
           <div className="space-y-6">
             <div>

@@ -6,13 +6,13 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, DollarSign, Car, Wrench } from "lucide-react";
+import { toast } from "@/app/components/ui/Toast";
 
 export default function CreateListingPage() {
   const [user, setUser] = useState<any>(null);
   const [cars, setCars] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const [listingType, setListingType] = useState<"car" | "part">("car");
   const [carId, setCarId] = useState("");
@@ -61,7 +61,6 @@ export default function CreateListingPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-    setError(null);
 
     try {
       let imageUrl = "";
@@ -98,9 +97,10 @@ export default function CreateListingPage() {
 
       if (insertError) throw insertError;
 
+      toast.success("Listing created successfully!");
       router.push("/marketplace");
     } catch (err: any) {
-      setError(err.message || "Failed to create listing");
+      toast.error(err.message || "Failed to create listing");
     } finally {
       setSubmitting(false);
       setUploading(false);
@@ -297,12 +297,6 @@ export default function CreateListingPage() {
                 />
               </div>
             </div>
-
-            {error && (
-              <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-red-200">
-                {error}
-              </div>
-            )}
 
             <div className="flex gap-3">
               <button

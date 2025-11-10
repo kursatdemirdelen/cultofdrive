@@ -16,7 +16,7 @@ import { CarForm } from "./components/CarForm";
 import { LockedState } from "./components/LockedState";
 import { HistoryNote } from "./components/HistoryNote";
 import { AdminDashboard } from "./components/AdminDashboard";
-import { Toast } from "./components/Toast";
+import { toast } from "@/app/components/ui/Toast";
 import { ConfirmDialog } from "./components/ConfirmDialog";
 import { ModerationPanel } from "./components/ModerationPanel";
 import { MarketplacePanel } from "./components/MarketplacePanel";
@@ -63,8 +63,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+
   const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; carId: string; carModel: string }>({ 
     isOpen: false, 
     carId: "", 
@@ -103,12 +102,11 @@ export default function AdminPage() {
 
   const fetchCars = useCallback(async () => {
     if (!adminKey) {
-      setError("Admin key is required.");
+      toast.error("Admin key is required.");
       return;
     }
 
     setLoading(true);
-    setError(null);
     setConnected(false);
 
     try {
@@ -124,10 +122,10 @@ export default function AdminPage() {
 
       setCars(Array.isArray(body.cars) ? body.cars : []);
       setConnected(true);
-      setMessage("Connected successfully.");
+      toast.success("Connected successfully.");
     } catch (err: any) {
       setConnected(false);
-      setError(err.message || "Failed to load cars.");
+      toast.error(err.message || "Failed to load cars.");
     } finally {
       setLoading(false);
     }
@@ -195,14 +193,14 @@ export default function AdminPage() {
   const handleCopyImage = useCallback((path?: string | null) => {
     const url = resolveImageUrl(path);
     if (!url) {
-      setMessage("This car has no image URL.");
+      toast.info("This car has no image URL.");
       return;
     }
 
     navigator.clipboard
       .writeText(url)
-      .then(() => setMessage("Image URL copied."))
-      .catch(() => setError("Unable to copy image URL."));
+      .then(() => toast.success("Image URL copied."))
+      .catch(() => toast.error("Unable to copy image URL."));
   }, []);
 
   const uploadImage = useCallback(async (): Promise<UploadResponse | null> => {
@@ -247,22 +245,21 @@ export default function AdminPage() {
     async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
       if (!adminKey) {
-        setError("Admin key is required.");
+        toast.error("Admin key is required.");
         return;
       }
 
       if (!form.model || form.model.trim().length < 2) {
-        setError("Model is required (minimum 2 characters).");
+        toast.error("Model is required (minimum 2 characters).");
         return;
       }
 
       if (form.description && form.description.length > 2000) {
-        setError("Description is too long (maximum 2000 characters).");
+        toast.error("Description is too long (maximum 2000 characters).");
         return;
       }
 
       setSaving(true);
-      setError(null);
 
       try {
         let imagePath = form.imageUrl;
@@ -301,7 +298,7 @@ export default function AdminPage() {
 
         if (!response.ok) throw new Error(body?.error || "Failed to save car.");
 
-        setMessage(form.id ? "Car updated." : "Car created.");
+        toast.success(form.id ? "Car updated." : "Car created.");
         await fetchCars();
 
         if (form.id) {
@@ -311,7 +308,7 @@ export default function AdminPage() {
           resetForm();
         }
       } catch (err: any) {
-        setError(err.message || "Failed to save car.");
+        toast.error(err.message || "Failed to save car.");
       } finally {
         setSaving(false);
       }
@@ -338,12 +335,11 @@ export default function AdminPage() {
     async () => {
       const { carId: id } = deleteDialog;
       if (!adminKey) {
-        setError("Admin key is required.");
+        toast.error("Admin key is required.");
         return;
       }
 
       setSaving(true);
-      setError(null);
 
       try {
         const response = await fetch(`/api/admin/cars/${id}`, {
@@ -354,11 +350,11 @@ export default function AdminPage() {
 
         if (!response.ok) throw new Error(body?.error || "Failed to delete car.");
 
-        setMessage("Car deleted.");
+        toast.success("Car deleted.");
         await fetchCars();
         if (form.id === id) resetForm();
       } catch (err: any) {
-        setError(err.message || "Failed to delete car.");
+        toast.error(err.message || "Failed to delete car.");
       } finally {
         setSaving(false);
         setDeleteDialog({ isOpen: false, carId: "", carModel: "" });
@@ -455,21 +451,6 @@ export default function AdminPage() {
 
         <HistoryNote />
       </div>
-
-      {message && (
-        <Toast
-          message={message}
-          type="success"
-          onClose={() => setMessage(null)}
-        />
-      )}
-      {error && (
-        <Toast
-          message={error}
-          type="error"
-          onClose={() => setError(null)}
-        />
-      )}
 
       <ConfirmDialog
         isOpen={deleteDialog.isOpen}

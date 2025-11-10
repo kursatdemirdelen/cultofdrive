@@ -2,12 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { supabaseBrowser } from "@/utils/supabase-browser";
+import { toast } from "@/app/components/ui/Toast";
 
 export default function AuthPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const googleEnabled = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === 'true';
 
   useEffect(() => {
@@ -21,13 +20,14 @@ export default function AuthPage() {
   };
 
   const signInWithMagicLink = async () => {
-    setLoading(true); setMessage(null); setError(null);
+    setLoading(true);
     try {
       const { error } = await supabaseBrowser.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.origin } });
       if (error) throw error;
-      setMessage('Check your email for the sign-in link.');
+      toast.success('Check your email for the sign-in link.');
+      setEmail("");
     } catch (e: any) {
-      setError(e?.message || 'Failed to send magic link');
+      toast.error(e?.message || 'Failed to send magic link');
     } finally { setLoading(false); }
   };
 
@@ -47,8 +47,6 @@ export default function AuthPage() {
             <input value={email} onChange={(e)=>setEmail(e.target.value)} placeholder="you@example.com" className="w-full px-3 py-2 rounded-md bg-white/10 border border-white/15 text-white placeholder-white/50" />
             <button onClick={signInWithMagicLink} disabled={loading || !email} className="w-full mt-3 btn-motorsport">{loading ? 'Sending...' : 'Send magic link'}</button>
           </div>
-          {message && <p className="text-emerald-300 text-sm">{message}</p>}
-          {error && <p className="text-red-300 text-sm">{error}</p>}
         </div>
       </div>
     </div>
