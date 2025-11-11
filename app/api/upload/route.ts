@@ -42,7 +42,11 @@ export async function POST(request: Request) {
 
     const displayName = profile?.display_name || 'user';
     const buffer = Buffer.from(await file.arrayBuffer());
-    const fileName = `${displayName.replace(/\s+/g, '-').toLowerCase()}-${Date.now()}.jpg`;
+    const sanitized = displayName
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    const fileName = `${sanitized}-${Date.now()}.jpg`;
 
     console.log('Uploading file:', fileName);
     const { data: storageData, error: storageError } = await supabase.storage
