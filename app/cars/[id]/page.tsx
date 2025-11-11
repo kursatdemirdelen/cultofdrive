@@ -7,6 +7,8 @@ import { ShareButton } from "@/app/components/cars/ShareButton";
 import { FavoriteButton } from "@/app/components/cars/FavoriteButton";
 import { ViewTracker } from "@/app/components/cars/ViewTracker";
 import { ReportButton } from "@/app/components/moderation/ReportButton";
+import { NewBadge } from "@/app/components/ui/NewBadge";
+import { isNew } from "@/utils/date";
 
 async function getCar(id: string) {
   const base = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
@@ -62,13 +64,16 @@ export default async function CarDetailPage({ params }: { params: Promise<{ id: 
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
             
-            {/* Featured Badge */}
-            {car.isFeatured && (
-              <div className="absolute right-4 top-4 flex items-center gap-1.5 rounded-md bg-black/60 px-3 py-1.5 backdrop-blur-xl">
-                <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
-                <span className="text-xs font-medium uppercase tracking-wider text-yellow-400">Featured</span>
-              </div>
-            )}
+            {/* Badges */}
+            <div className="absolute right-4 top-4 flex items-center gap-2">
+              {car.created_at && isNew(car.created_at) && <NewBadge />}
+              {car.isFeatured && (
+                <div className="flex items-center gap-1.5 rounded-md bg-black/60 px-3 py-1.5 backdrop-blur-xl">
+                  <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
+                  <span className="text-xs font-medium uppercase tracking-wider text-yellow-400">Featured</span>
+                </div>
+              )}
+            </div>
 
             {/* Title Overlay */}
             <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
