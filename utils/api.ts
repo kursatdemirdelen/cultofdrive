@@ -31,3 +31,8 @@ export const CarsAPI = {
   unfavorite: (carId: string, user_id: string) =>
     api.delete(`/api/cars/${carId}/favorites`, { data: { user_id } }).then((r) => r.data),
 }
+
+export function extractOwnerName(userProfiles: any): string {
+  const profile = Array.isArray(userProfiles) ? userProfiles[0] : userProfiles;
+  return profile?.display_name || 'Anonymous';
+}

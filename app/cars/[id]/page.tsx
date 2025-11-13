@@ -1,14 +1,16 @@
-import Image from "next/image";
 import CarInteractions from "@/app/components/cars/CarInteractions";
 import type { Metadata } from "next";
-import { Calendar, User, Star, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { ShareButton } from "@/app/components/cars/ShareButton";
 import { FavoriteButton } from "@/app/components/cars/FavoriteButton";
 import { ViewTracker } from "@/app/components/cars/ViewTracker";
 import { ReportButton } from "@/app/components/moderation/ReportButton";
-import { NewBadge } from "@/app/components/ui/NewBadge";
-import { isNew } from "@/utils/date";
+import { CarHeroImage } from "@/app/components/cars/CarHeroImage";
+import { CarStory } from "@/app/components/cars/CarStory";
+import { CarSpecs } from "@/app/components/cars/CarSpecs";
+import { CarSidebar } from "@/app/components/cars/CarSidebar";
+import { getImageUrl } from "@/utils/image";
 
 async function getCar(id: string) {
   const base = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
@@ -42,82 +44,18 @@ export default async function CarDetailPage({ params }: { params: Promise<{ id: 
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 pb-16">
       <ViewTracker carId={id} />
 
-      {/* Hero Image */}
       <section className="relative mx-auto w-full max-w-6xl px-4 pt-6 sm:px-6">
-        <div className="relative overflow-hidden rounded-xl border border-white/10 bg-black/60 backdrop-blur">
-          <div className="relative aspect-video w-full">
-            {car.imageUrl ? (
-              <Image 
-                src={car.imageUrl.startsWith('public/') ? `/${car.imageUrl.replace('public/', '')}` : car.imageUrl} 
-                alt={car.model} 
-                fill 
-                className="object-cover" 
-                priority 
-                placeholder="blur"
-                blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCwABmX/9k="
-                sizes="(max-width: 1280px) 100vw, 1280px"
-              />
-            ) : (
-              <div className="flex h-full items-center justify-center bg-gradient-to-br from-slate-900 via-black to-slate-950 text-white/50">
-                No image available
-              </div>
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-            
-            {/* Badges */}
-            <div className="absolute right-4 top-4 flex items-center gap-2">
-              {car.created_at && isNew(car.created_at) && <NewBadge />}
-              {car.isFeatured && (
-                <div className="flex items-center gap-1.5 rounded-md bg-black/60 px-3 py-1.5 backdrop-blur-xl">
-                  <Star className="h-3.5 w-3.5 fill-yellow-400 text-yellow-400" />
-                  <span className="text-xs font-medium uppercase tracking-wider text-yellow-400">Featured</span>
-                </div>
-              )}
-            </div>
-
-            {/* Title Overlay */}
-            <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
-              <h1 className="mb-2 text-3xl font-light tracking-tight text-white sm:text-4xl md:text-5xl">
-                {car.model}
-              </h1>
-              <div className="flex flex-wrap items-center gap-3 text-xs text-white/60">
-                {car.year && (
-                  <span className="flex items-center gap-1.5">
-                    <Calendar className="h-3.5 w-3.5" />
-                    {car.year}
-                  </span>
-                )}
-                <span className="text-white/30">•</span>
-                {car.driverSlug && car.driverSlug !== 'anonymous' ? (
-                  <Link 
-                    href={`/driver/${car.driverSlug}`}
-                    className="flex items-center gap-1.5 hover:text-white transition"
-                  >
-                    <User className="h-3.5 w-3.5" />
-                    {owner}
-                  </Link>
-                ) : (
-                  <span className="flex items-center gap-1.5">
-                    <User className="h-3.5 w-3.5" />
-                    {owner}
-                  </span>
-                )}
-                {car.view_count > 0 && (
-                  <>
-                    <span className="text-white/30">•</span>
-                    <span>{car.view_count} views</span>
-                  </>
-                )}
-                {addedOn && (
-                  <>
-                    <span className="text-white/30">•</span>
-                    <span>{addedOn}</span>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
+        <CarHeroImage
+          imageUrl={car.imageUrl}
+          model={car.model}
+          createdAt={car.created_at}
+          isFeatured={car.isFeatured}
+          year={car.year}
+          owner={owner}
+          driverSlug={car.driverSlug}
+          viewCount={car.view_count}
+          addedOn={addedOn}
+        />
         
         {/* Action Buttons */}
         <div className="mt-4 flex items-center justify-between gap-2">
@@ -139,96 +77,19 @@ export default async function CarDetailPage({ params }: { params: Promise<{ id: 
       {/* Content */}
       <section className="mx-auto mt-8 w-full max-w-6xl px-4 sm:px-6">
         <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
-          {/* Main Content */}
           <div className="space-y-6">
-            {/* Story */}
-            <div className="rounded-lg border border-white/10 bg-black/40 p-6 backdrop-blur">
-              <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-white/40">Story</h2>
-              <p className="whitespace-pre-line text-base leading-relaxed text-white/80">
-                {car.description || "No story shared yet."}
-              </p>
-            </div>
-
-            {/* Specifications */}
-            {car.specs?.length > 0 && (
-              <div className="rounded-lg border border-white/10 bg-black/40 p-6 backdrop-blur">
-                <h2 className="mb-4 text-sm font-medium uppercase tracking-wider text-white/40">Specifications</h2>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {car.specs.map((spec: string, index: number) => (
-                    <div
-                      key={index}
-                      className="flex items-center gap-3 rounded border border-white/10 bg-white/[0.03] px-4 py-2.5"
-                    >
-                      <div className="h-1 w-1 rounded-full bg-white/40" />
-                      <span className="text-sm text-white/70">{spec}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Interactions */}
+            <CarStory description={car.description} />
+            <CarSpecs specs={car.specs} />
             <CarInteractions carId={id} />
           </div>
 
-          {/* Sidebar */}
-          <aside className="space-y-6">
-            {/* Build Details */}
-            <div className="rounded-lg border border-white/10 bg-black/40 p-6 backdrop-blur">
-              <h3 className="mb-4 text-xs font-medium uppercase tracking-wider text-white/40">
-                Build Details
-              </h3>
-              <dl className="space-y-4">
-                <div>
-                  <dt className="text-xs text-white/50">Owner</dt>
-                  <dd className="mt-1 text-base font-medium text-white">
-                    {car.driverSlug && car.driverSlug !== 'anonymous' ? (
-                      <Link 
-                        href={`/driver/${car.driverSlug}`}
-                        className="hover:text-white/80 transition"
-                      >
-                        {owner}
-                      </Link>
-                    ) : (
-                      <span>{owner}</span>
-                    )}
-                  </dd>
-                </div>
-                {car.year && (
-                  <div>
-                    <dt className="text-xs text-white/50">Model Year</dt>
-                    <dd className="mt-1 text-base font-medium text-white">{car.year}</dd>
-                  </div>
-                )}
-                {addedOn && (
-                  <div>
-                    <dt className="text-xs text-white/50">Added</dt>
-                    <dd className="mt-1 text-base font-medium text-white">{addedOn}</dd>
-                  </div>
-                )}
-              </dl>
-            </div>
-
-            {/* Tags */}
-            {car.tags?.length > 0 && (
-              <div className="rounded-lg border border-white/10 bg-black/40 p-6 backdrop-blur">
-                <h3 className="mb-4 text-xs font-medium uppercase tracking-wider text-white/40">
-                  Tags
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {car.tags.map((tag: string, index: number) => (
-                    <Link
-                      key={index}
-                      href={`/garage?tag=${encodeURIComponent(tag)}`}
-                      className="rounded-md border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-white/60 transition hover:bg-white/[0.06] hover:text-white/80"
-                    >
-                      {tag}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-          </aside>
+          <CarSidebar
+            owner={owner}
+            driverSlug={car.driverSlug}
+            year={car.year}
+            addedOn={addedOn}
+            tags={car.tags}
+          />
         </div>
       </section>
     </div>
@@ -249,7 +110,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
         title,
         description,
         images: car.imageUrl ? [{
-          url: car.imageUrl.startsWith('public/') ? `/${car.imageUrl.replace('public/', '')}` : car.imageUrl,
+          url: getImageUrl(car.imageUrl),
           width: 1200,
           height: 630,
           alt: car.model,
@@ -259,7 +120,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
         card: 'summary_large_image',
         title,
         description,
-        images: car.imageUrl ? [car.imageUrl.startsWith('public/') ? `/${car.imageUrl.replace('public/', '')}` : car.imageUrl] : [],
+        images: car.imageUrl ? [getImageUrl(car.imageUrl)] : [],
       },
     };
   } catch {
