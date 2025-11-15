@@ -64,7 +64,7 @@ export default async function CarDetailPage({ params }: { params: Promise<{ id: 
             className="group inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white/70 backdrop-blur-sm transition hover:bg-white/[0.06] hover:text-white"
           >
             <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-1" />
-            Back
+            Back to Garage
           </Link>
           <div className="flex items-center gap-2">
             <FavoriteButton carId={id} />
