@@ -21,15 +21,7 @@ CREATE TABLE IF NOT EXISTS public.cars (
   specs JSONB NOT NULL DEFAULT '[]'::jsonb,
   tags TEXT[] NOT NULL DEFAULT '{}',
   is_featured BOOLEAN DEFAULT false,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
--- Car images
-CREATE TABLE IF NOT EXISTS public.car_images (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  car_id UUID NOT NULL REFERENCES public.cars(id) ON DELETE CASCADE,
-  path TEXT NOT NULL,
-  is_primary BOOLEAN NOT NULL DEFAULT false,
+  view_count INT4 DEFAULT 0,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
@@ -49,17 +41,6 @@ CREATE TABLE IF NOT EXISTS public.favorites (
   user_id UUID NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   UNIQUE (car_id, user_id)
-);
-
--- Social posts
-CREATE TABLE IF NOT EXISTS public.social_posts (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  username TEXT NOT NULL,
-  content TEXT NOT NULL,
-  image_url TEXT,
-  like_count INT4 NOT NULL DEFAULT 0,
-  url TEXT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 -- Email subscriptions
@@ -138,10 +119,7 @@ CREATE TABLE IF NOT EXISTS public.car_views (
   viewed_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
--- Add view_count column to cars for caching
-ALTER TABLE public.cars ADD COLUMN IF NOT EXISTS view_count INT4 DEFAULT 0;
-
--- Function to update view count (secure)
+-- Function to update view count
 CREATE OR REPLACE FUNCTION public.update_car_view_count()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -216,10 +194,8 @@ ALTER TABLE public.notifications ADD CONSTRAINT notifications_user_id_fkey
 
 -- Enable RLS on all tables
 ALTER TABLE public.cars ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.car_images ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.car_comments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.favorites ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.social_posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public."E-mail" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.car_views ENABLE ROW LEVEL SECURITY;
@@ -263,6 +239,17 @@ CREATE POLICY "Public read profiles" ON public.user_profiles FOR SELECT USING (t
 DROP POLICY IF EXISTS "Users can update own profile" ON public.user_profiles;
 CREATE POLICY "Users can update own profile" ON public.user_profiles FOR UPDATE USING (auth.uid() = id);
 
+-- Car views policies
+DROP POLICY IF EXISTS "Public read car views" ON public.car_views;
+CREATE POLICY "Public read car views" ON public.car_views FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Anyone can insert car views" ON public.car_views;
+CREATE POLICY "Anyone can insert car views" ON public.car_views FOR INSERT WITH CHECK (true);
+
+-- Email subscriptions policies
+DROP POLICY IF EXISTS "Anyone can subscribe" ON public."E-mail";
+CREATE POLICY "Anyone can subscribe" ON public."E-mail" FOR INSERT WITH CHECK (true);
+
 -- Notifications policies
 DROP POLICY IF EXISTS "Users can read own notifications" ON public.notifications;
 CREATE POLICY "Users can read own notifications" ON public.notifications FOR SELECT USING (auth.uid() = user_id);
@@ -270,85 +257,66 @@ CREATE POLICY "Users can read own notifications" ON public.notifications FOR SEL
 DROP POLICY IF EXISTS "Users can update own notifications" ON public.notifications;
 CREATE POLICY "Users can update own notifications" ON public.notifications FOR UPDATE USING (auth.uid() = user_id);
 
--- Other public read policies
-DROP POLICY IF EXISTS "Public read car_images" ON public.car_images;
-CREATE POLICY "Public read car_images" ON public.car_images FOR SELECT USING (true);
-
-DROP POLICY IF EXISTS "Public read social_posts" ON public.social_posts;
-CREATE POLICY "Public read social_posts" ON public.social_posts FOR SELECT USING (true);
-
-DROP POLICY IF EXISTS "Public insert social_posts" ON public.social_posts;
-CREATE POLICY "Public insert social_posts" ON public.social_posts FOR INSERT WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Public insert emails" ON public."E-mail";
-CREATE POLICY "Public insert emails" ON public."E-mail" FOR INSERT WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Public insert car_views" ON public.car_views;
-CREATE POLICY "Public insert car_views" ON public.car_views FOR INSERT WITH CHECK (true);
-
-DROP POLICY IF EXISTS "Public read car_views" ON public.car_views;
-CREATE POLICY "Public read car_views" ON public.car_views FOR SELECT USING (true);
+-- Reports policies
+DROP POLICY IF EXISTS "Users can create reports" ON public.reports;
+CREATE POLICY "Users can create reports" ON public.reports FOR INSERT WITH CHECK (true);
 
 -- =============================================
--- STEP 6: Storage Bucket
+-- STEP 6: Storage Setup
 -- =============================================
 
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('garage', 'garage', true)
+-- Create storage bucket for car images
+INSERT INTO storage.buckets (id, name, public) 
+VALUES ('car-images', 'car-images', true)
 ON CONFLICT (id) DO NOTHING;
 
-DROP POLICY IF EXISTS "Public read garage" ON storage.objects;
-CREATE POLICY "Public read garage" ON storage.objects FOR SELECT USING (bucket_id = 'garage');
-
-DROP POLICY IF EXISTS "Public upload garage" ON storage.objects;
-CREATE POLICY "Public upload garage" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'garage');
-
--- =============================================
--- STEP 7: Indexes
--- =============================================
-
-CREATE INDEX IF NOT EXISTS idx_cars_created_at ON public.cars (created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_cars_user_id ON public.cars (user_id);
-CREATE INDEX IF NOT EXISTS idx_cars_tags ON public.cars USING gin (tags);
-
-CREATE INDEX IF NOT EXISTS idx_car_images_car_id ON public.car_images (car_id);
-CREATE INDEX IF NOT EXISTS idx_car_comments_car_id ON public.car_comments (car_id, created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_favorites_car_id ON public.favorites (car_id);
-CREATE INDEX IF NOT EXISTS idx_favorites_user_id ON public.favorites (user_id);
-
-CREATE INDEX IF NOT EXISTS idx_user_profiles_email ON public.user_profiles (email);
-CREATE INDEX IF NOT EXISTS idx_user_profiles_slug ON public.user_profiles (slug);
-
-CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON public.notifications (user_id, created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_car_views_car_id ON public.car_views (car_id);
-
-CREATE INDEX IF NOT EXISTS idx_social_posts_created_at ON public.social_posts (created_at DESC);
+-- Storage policies
+CREATE POLICY "Public read car images" ON storage.objects FOR SELECT USING (bucket_id = 'car-images');
+CREATE POLICY "Authenticated users can upload" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'car-images' AND auth.role() = 'authenticated');
+CREATE POLICY "Users can update own uploads" ON storage.objects FOR UPDATE USING (bucket_id = 'car-images' AND auth.uid()::text = (storage.foldername(name))[1]);
+CREATE POLICY "Users can delete own uploads" ON storage.objects FOR DELETE USING (bucket_id = 'car-images' AND auth.uid()::text = (storage.foldername(name))[1]);
 
 -- =============================================
--- STEP 8: Migrate Existing Data
+-- STEP 7: Indexes for Performance
 -- =============================================
 
--- Create profiles for existing auth users
-INSERT INTO public.user_profiles (id, email, display_name, slug)
-SELECT 
-  id,
-  email,
-  COALESCE(raw_user_meta_data->>'full_name', split_part(email, '@', 1)),
-  lower(regexp_replace(regexp_replace(trim(COALESCE(raw_user_meta_data->>'full_name', split_part(email, '@', 1))), '\s+', '-', 'g'), '[^a-z0-9\-]', '', 'g'))
-FROM auth.users
-WHERE id NOT IN (SELECT id FROM public.user_profiles)
-ON CONFLICT (id) DO NOTHING;
+-- Cars indexes
+CREATE INDEX IF NOT EXISTS idx_cars_user_id ON public.cars(user_id);
+CREATE INDEX IF NOT EXISTS idx_cars_model ON public.cars(model);
+CREATE INDEX IF NOT EXISTS idx_cars_year ON public.cars(year);
+CREATE INDEX IF NOT EXISTS idx_cars_featured ON public.cars(is_featured);
+CREATE INDEX IF NOT EXISTS idx_cars_created_at ON public.cars(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_cars_tags ON public.cars USING GIN(tags);
 
--- Clean orphan records
-UPDATE public.car_comments SET user_id = NULL 
-WHERE user_id IS NOT NULL AND user_id NOT IN (SELECT id FROM public.user_profiles);
+-- Comments indexes
+CREATE INDEX IF NOT EXISTS idx_comments_car_id ON public.car_comments(car_id);
+CREATE INDEX IF NOT EXISTS idx_comments_user_id ON public.car_comments(user_id);
+CREATE INDEX IF NOT EXISTS idx_comments_created_at ON public.car_comments(created_at DESC);
 
-DELETE FROM public.favorites 
-WHERE user_id NOT IN (SELECT id FROM public.user_profiles);
+-- Favorites indexes
+CREATE INDEX IF NOT EXISTS idx_favorites_car_id ON public.favorites(car_id);
+CREATE INDEX IF NOT EXISTS idx_favorites_user_id ON public.favorites(user_id);
 
-UPDATE public.cars SET user_id = NULL 
-WHERE user_id IS NOT NULL AND user_id NOT IN (SELECT id FROM public.user_profiles);
+-- User profiles indexes
+CREATE INDEX IF NOT EXISTS idx_profiles_slug ON public.user_profiles(slug);
+CREATE INDEX IF NOT EXISTS idx_profiles_display_name ON public.user_profiles(display_name);
+
+-- Car views indexes
+CREATE INDEX IF NOT EXISTS idx_car_views_car_id ON public.car_views(car_id);
+CREATE INDEX IF NOT EXISTS idx_car_views_viewed_at ON public.car_views(viewed_at DESC);
 
 -- =============================================
--- Setup Complete!
+-- STEP 8: Permissions & Realtime
 -- =============================================
+
+-- Grant necessary permissions
+GRANT USAGE ON SCHEMA public TO anon, authenticated;
+GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated;
+
+-- Enable realtime for live features
+ALTER PUBLICATION supabase_realtime ADD TABLE public.car_comments;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.favorites;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.notifications;
+
+SELECT 'Database setup complete! 🚗' as status;

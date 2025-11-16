@@ -11,36 +11,17 @@ export function useSocialPosts() {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const instagramResponse = await fetch("/api/instagram");
-        if (instagramResponse.ok) {
-          const data = await instagramResponse.json();
-          setPosts(data.posts);
-          setLoading(false);
-          return;
-        }
-      } catch (err) {
-        console.error("Instagram fetch error:", err);
-      }
-
-      try {
-        const response = await fetch("/api/social-posts");
+        const response = await fetch("/api/instagram");
         if (response.ok) {
           const data = await response.json();
           setPosts(data.posts);
-          setLoading(false);
-          return;
         } else {
           setError("Unable to load posts at this time.");
-          setLoading(false);
         }
       } catch (err) {
-        console.error("Fallback fetch error:", err);
+        console.error("Instagram fetch error:", err);
         setError("Unable to load posts at this time.");
-        setLoading(false);
       }
-
-      setPosts([]);
-      setError("No posts available.");
       setLoading(false);
     };
 

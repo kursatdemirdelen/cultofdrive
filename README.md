@@ -168,7 +168,8 @@ car_comments     # Comments with user info
 favorites        # User favorites
 car_views        # View analytics
 notifications    # Real-time notifications
-social_posts     # Social feed
+reports          # Content reports
+"E-mail"         # Email subscriptions
 ```
 
 ### Key Relationships
