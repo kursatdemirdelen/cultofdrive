@@ -76,6 +76,13 @@ This file includes:
 /admin               Admin dashboard
 ```
 
+### Marketplace
+```
+/marketplace         Browse listings
+/marketplace/create  Create listing
+/marketplace/[id]    Listing details
+```
+
 ---
 
 ## 📁 Project Structure
@@ -162,14 +169,16 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
 ### Core Tables
 ```sql
-user_profiles    # User data (display_name, slug, avatar_url, bio)
-cars             # Car listings (linked to user_profiles)
-car_comments     # Comments with user info
-favorites        # User favorites
-car_views        # View analytics
-notifications    # Real-time notifications
-reports          # Content reports
-"E-mail"         # Email subscriptions
+user_profiles           # User data (display_name, slug, avatar_url, bio)
+cars                    # Car listings (linked to user_profiles)
+car_comments            # Comments with user info
+favorites               # User favorites
+car_views               # View analytics
+notifications           # Real-time notifications
+reports                 # Content reports
+marketplace_listings    # Marketplace car/part listings
+marketplace_inquiries   # Marketplace inquiries
+"E-mail"                # Email subscriptions
 ```
 
 ### Key Relationships

@@ -1,9 +1,7 @@
-import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import type { ReactNode } from "react";
-import { Analytics } from "@vercel/analytics/next";
 import TopBar from "@/app/components/nav/TopBar";
 import { ToastContainer } from "@/app/components/ui/Toast";
 
@@ -92,8 +90,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <TopBar />
         <main className="pt-8 md:pt-12">{children}</main>
         <ToastContainer />
-        <SpeedInsights />
-        <Analytics />
+
       </body>
     </html>
   );

@@ -38,9 +38,14 @@ app/
 ├── driver/[slug]/        # Driver profile pages
 ├── profile/              # Own profile (redirects to driver)
 ├── feed/                 # Social feed functionality
-└── garage/               # Car collection management
-    ├── add/              # Add new car form
-    └── page.tsx          # Public garage browser
+├── garage/               # Car collection management
+│   ├── add/              # Add new car form
+│   └── page.tsx          # Public garage browser
+└── marketplace/          # Marketplace for buying/selling
+    ├── create/           # Create listing
+    ├── edit/             # Edit listing
+    ├── [id]/             # Listing details
+    └── page.tsx          # Browse listings
 ```
 
 #### API Routes (`/app/api`)
@@ -51,9 +56,10 @@ api/
 │   └── upload/          # Image upload handling
 ├── cars/                # Public car data endpoints
 ├── instagram/           # Social media integration
-├── social-posts/        # Community feed management
+├── marketplace/         # Marketplace listings
+├── profiles/            # User profiles
 ├── subscribe/           # Email subscription
-└── seed-*/             # Development data seeding
+└── upload/              # File upload handling
 ```
 
 #### Component Architecture (`/app/components`)

@@ -32,15 +32,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Static routes
   const routes = [
-    "",
-    "/garage",
-    "/marketplace",
-    "/auth",
-  ].map((route) => ({
+    { route: "", priority: 1.0 },
+    { route: "/garage", priority: 0.9 },
+    { route: "/marketplace", priority: 0.8 },
+    { route: "/auth", priority: 0.3 },
+  ].map(({ route, priority }) => ({
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
     changeFrequency: "daily" as const,
-    priority: route === "" ? 1 : 0.8,
+    priority,
   }));
 
   // Dynamic car routes

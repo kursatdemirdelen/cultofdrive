@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server'
 import { supabase } from '@/utils/supabase'
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   try {
     const { data, error } = await supabase
       .from('marketplace_listings')
       .select('*, cars(model, image_url, year)')
-      .eq('id', params.id)
+      .eq('id', id)
       .single()
 
     if (error) {
@@ -19,14 +20,15 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
   }
 }
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   try {
     const body = await req.json()
     
     const { data, error } = await supabase
       .from('marketplace_listings')
       .update(body)
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
 
     if (error) {
@@ -39,12 +41,13 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   try {
     const { error } = await supabase
       .from('marketplace_listings')
       .delete()
-      .eq('id', params.id)
+      .eq('id', id)
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 })
