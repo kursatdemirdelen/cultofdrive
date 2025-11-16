@@ -138,6 +138,30 @@ CREATE TABLE IF NOT EXISTS public.car_views (
   viewed_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- Add view_count column to cars for caching
+ALTER TABLE public.cars ADD COLUMN IF NOT EXISTS view_count INT4 DEFAULT 0;
+
+-- Function to update view count (secure)
+CREATE OR REPLACE FUNCTION public.update_car_view_count()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SET search_path = public, pg_catalog
+AS $$
+BEGIN
+  UPDATE public.cars
+  SET view_count = (
+    SELECT count(*) FROM public.car_views WHERE car_id = NEW.car_id
+  )
+  WHERE id = NEW.car_id;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trigger_update_car_view_count ON public.car_views;
+CREATE TRIGGER trigger_update_car_view_count
+  AFTER INSERT ON public.car_views
+  FOR EACH ROW EXECUTE FUNCTION public.update_car_view_count();
+
 -- Notifications
 CREATE TABLE IF NOT EXISTS public.notifications (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -258,6 +282,12 @@ CREATE POLICY "Public insert social_posts" ON public.social_posts FOR INSERT WIT
 
 DROP POLICY IF EXISTS "Public insert emails" ON public."E-mail";
 CREATE POLICY "Public insert emails" ON public."E-mail" FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public insert car_views" ON public.car_views;
+CREATE POLICY "Public insert car_views" ON public.car_views FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Public read car_views" ON public.car_views;
+CREATE POLICY "Public read car_views" ON public.car_views FOR SELECT USING (true);
 
 -- =============================================
 -- STEP 6: Storage Bucket
