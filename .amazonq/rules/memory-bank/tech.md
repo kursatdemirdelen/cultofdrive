@@ -64,7 +64,7 @@
 ### Environment Setup
 1. **Dependencies**: `npm install`
 2. **Environment**: Copy `env.example` to `.env.local`
-3. **Database**: Run `supabase/schema.sql` in Supabase SQL Editor
+3. **Database**: Run `supabase/setup.sql` in Supabase SQL Editor
 4. **Development**: `npm run dev`
 
 ## Environment Variables

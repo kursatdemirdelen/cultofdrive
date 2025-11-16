@@ -1,34 +1,39 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getAdminSupabaseClient } from "@/utils/admin-supabase";
+import { NextResponse } from 'next/server'
+import { supabase } from '@/utils/supabase'
 
-export const runtime = 'nodejs';
+export async function GET() {
+  try {
+    const { data, error } = await supabase
+      .from('marketplace_listings')
+      .select('*, cars(model, image_url, year)')
+      .eq('status', 'active')
+      .order('created_at', { ascending: false })
 
-function assertAdminKey(req: NextRequest) {
-  const adminKey = req.headers.get("x-admin-key");
-  const validKey = process.env.ADMIN_API_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!adminKey || adminKey !== validKey) {
-    throw new Error("Unauthorized");
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ listings: data || [] })
+  } catch (err) {
+    return NextResponse.json({ error: 'Failed to fetch listings' }, { status: 500 })
   }
 }
 
-export async function GET(req: NextRequest) {
+export async function POST(req: Request) {
   try {
-    assertAdminKey(req);
-    const supabase = getAdminSupabaseClient();
-
+    const body = await req.json()
+    
     const { data, error } = await supabase
-      .from("marketplace_listings")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(100);
+      .from('marketplace_listings')
+      .insert(body)
+      .select()
 
-    if (error) throw error;
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
 
-    return NextResponse.json({ listings: data });
-  } catch (err: any) {
-    return NextResponse.json(
-      { error: err.message || "Failed to fetch listings" },
-      { status: err.message === "Unauthorized" ? 401 : 500 }
-    );
+    return NextResponse.json({ listing: data[0] }, { status: 201 })
+  } catch (err) {
+    return NextResponse.json({ error: 'Failed to create listing' }, { status: 500 })
   }
 }

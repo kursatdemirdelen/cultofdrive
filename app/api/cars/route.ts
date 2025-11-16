@@ -62,7 +62,7 @@ export async function GET(req: Request) {
     const cars = (data || []).map((row: any) => {
       let imageUrl = ''
       if (row.image_url) {
-        const { data: pub } = supabase.storage.from('garage').getPublicUrl(row.image_url)
+        const { data: pub } = supabase.storage.from('car-images').getPublicUrl(row.image_url)
         imageUrl = pub?.publicUrl || row.image_url
       }
 

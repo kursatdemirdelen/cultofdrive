@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     const filename = `${Date.now()}-${file.name}`
 
     const { data, error } = await supabase.storage
-      .from('garage')
+      .from('car-images')
       .upload(`admin/${filename}`, buffer, {
         contentType: file.type,
         cacheControl: '3600'
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     if (error) throw error
 
     const { data: { publicUrl } } = supabase.storage
-      .from('garage')
+      .from('car-images')
       .getPublicUrl(data.path)
 
     return NextResponse.json({ 

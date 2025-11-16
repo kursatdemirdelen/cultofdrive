@@ -158,7 +158,7 @@ export default function MarketplacePage() {
                 if (listing.image_url) {
                   return listing.image_url.startsWith('http') 
                     ? listing.image_url 
-                    : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/garage/${listing.image_url}`;
+                    : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/car-images/${listing.image_url}`;
                 }
                 if (listing.cars?.image_url) {
                   return listing.cars.image_url.startsWith('public/') 

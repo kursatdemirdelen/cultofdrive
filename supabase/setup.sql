@@ -164,6 +164,37 @@ CREATE TABLE IF NOT EXISTS public.reports (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+-- Marketplace listings
+CREATE TABLE IF NOT EXISTS public.marketplace_listings (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  listing_type TEXT NOT NULL CHECK (listing_type IN ('car', 'part')),
+  car_id UUID REFERENCES public.cars(id) ON DELETE SET NULL,
+  seller_id UUID NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  image_url TEXT,
+  price DECIMAL(10,2) NOT NULL,
+  currency TEXT DEFAULT 'USD',
+  location TEXT,
+  contact_email TEXT NOT NULL,
+  contact_phone TEXT,
+  status TEXT DEFAULT 'active' CHECK (status IN ('active', 'sold', 'inactive')),
+  views INT4 DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Marketplace inquiries
+CREATE TABLE IF NOT EXISTS public.marketplace_inquiries (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  listing_id UUID NOT NULL REFERENCES public.marketplace_listings(id) ON DELETE CASCADE,
+  inquirer_id UUID NOT NULL,
+  message TEXT NOT NULL,
+  contact_email TEXT NOT NULL,
+  contact_phone TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
 -- =============================================
 -- STEP 4: Foreign Keys & Constraints
 -- =============================================
@@ -188,6 +219,15 @@ ALTER TABLE public.notifications DROP CONSTRAINT IF EXISTS notifications_user_id
 ALTER TABLE public.notifications ADD CONSTRAINT notifications_user_id_fkey 
   FOREIGN KEY (user_id) REFERENCES public.user_profiles(id) ON DELETE CASCADE;
 
+-- Add foreign keys to marketplace
+ALTER TABLE public.marketplace_listings DROP CONSTRAINT IF EXISTS marketplace_listings_seller_id_fkey;
+ALTER TABLE public.marketplace_listings ADD CONSTRAINT marketplace_listings_seller_id_fkey 
+  FOREIGN KEY (seller_id) REFERENCES public.user_profiles(id) ON DELETE CASCADE;
+
+ALTER TABLE public.marketplace_inquiries DROP CONSTRAINT IF EXISTS marketplace_inquiries_inquirer_id_fkey;
+ALTER TABLE public.marketplace_inquiries ADD CONSTRAINT marketplace_inquiries_inquirer_id_fkey 
+  FOREIGN KEY (inquirer_id) REFERENCES public.user_profiles(id) ON DELETE CASCADE;
+
 -- =============================================
 -- STEP 5: Row Level Security (RLS)
 -- =============================================
@@ -201,6 +241,8 @@ ALTER TABLE public.user_profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.car_views ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.reports ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.marketplace_listings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.marketplace_inquiries ENABLE ROW LEVEL SECURITY;
 
 -- Cars policies
 DROP POLICY IF EXISTS "Public read cars" ON public.cars;
@@ -261,6 +303,26 @@ CREATE POLICY "Users can update own notifications" ON public.notifications FOR U
 DROP POLICY IF EXISTS "Users can create reports" ON public.reports;
 CREATE POLICY "Users can create reports" ON public.reports FOR INSERT WITH CHECK (true);
 
+-- Marketplace listings policies
+DROP POLICY IF EXISTS "Public read marketplace listings" ON public.marketplace_listings;
+CREATE POLICY "Public read marketplace listings" ON public.marketplace_listings FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Users can insert marketplace listings" ON public.marketplace_listings;
+CREATE POLICY "Users can insert marketplace listings" ON public.marketplace_listings FOR INSERT WITH CHECK (auth.uid() = seller_id);
+
+DROP POLICY IF EXISTS "Users can update own marketplace listings" ON public.marketplace_listings;
+CREATE POLICY "Users can update own marketplace listings" ON public.marketplace_listings FOR UPDATE USING (auth.uid() = seller_id);
+
+DROP POLICY IF EXISTS "Users can delete own marketplace listings" ON public.marketplace_listings;
+CREATE POLICY "Users can delete own marketplace listings" ON public.marketplace_listings FOR DELETE USING (auth.uid() = seller_id);
+
+-- Marketplace inquiries policies
+DROP POLICY IF EXISTS "Users can read own marketplace inquiries" ON public.marketplace_inquiries;
+CREATE POLICY "Users can read own marketplace inquiries" ON public.marketplace_inquiries FOR SELECT USING (auth.uid() = inquirer_id OR auth.uid() IN (SELECT seller_id FROM public.marketplace_listings WHERE id = listing_id));
+
+DROP POLICY IF EXISTS "Users can create marketplace inquiries" ON public.marketplace_inquiries;
+CREATE POLICY "Users can create marketplace inquiries" ON public.marketplace_inquiries FOR INSERT WITH CHECK (auth.uid() = inquirer_id);
+
 -- =============================================
 -- STEP 6: Storage Setup
 -- =============================================
@@ -304,6 +366,13 @@ CREATE INDEX IF NOT EXISTS idx_profiles_display_name ON public.user_profiles(dis
 -- Car views indexes
 CREATE INDEX IF NOT EXISTS idx_car_views_car_id ON public.car_views(car_id);
 CREATE INDEX IF NOT EXISTS idx_car_views_viewed_at ON public.car_views(viewed_at DESC);
+
+-- Marketplace indexes
+CREATE INDEX IF NOT EXISTS idx_marketplace_listings_seller_id ON public.marketplace_listings(seller_id);
+CREATE INDEX IF NOT EXISTS idx_marketplace_listings_status ON public.marketplace_listings(status);
+CREATE INDEX IF NOT EXISTS idx_marketplace_listings_type ON public.marketplace_listings(listing_type);
+CREATE INDEX IF NOT EXISTS idx_marketplace_listings_created_at ON public.marketplace_listings(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_marketplace_inquiries_listing_id ON public.marketplace_inquiries(listing_id);
 
 -- =============================================
 -- STEP 8: Permissions & Realtime

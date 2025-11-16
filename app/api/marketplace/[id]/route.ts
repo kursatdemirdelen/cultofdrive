@@ -1,35 +1,57 @@
-import { NextResponse } from "next/server";
-import { getSupabaseClient } from "@/utils/supabase";
+import { NextResponse } from 'next/server'
+import { supabase } from '@/utils/supabase'
 
-export const runtime = 'nodejs';
-
-export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }) {
+export async function GET(req: Request, { params }: { params: { id: string } }) {
   try {
-    const supabase = getSupabaseClient();
-    const { id } = await ctx.params;
-
     const { data, error } = await supabase
-      .from("marketplace_listings")
-      .select("*, cars(model, image_url, year)")
-      .eq("id", id)
-      .single();
+      .from('marketplace_listings')
+      .select('*, cars(model, image_url, year)')
+      .eq('id', params.id)
+      .single()
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    if (!data) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json({ listing: data })
+  } catch (err) {
+    return NextResponse.json({ error: 'Failed to fetch listing' }, { status: 500 })
+  }
+}
+
+export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+  try {
+    const body = await req.json()
+    
+    const { data, error } = await supabase
+      .from('marketplace_listings')
+      .update(body)
+      .eq('id', params.id)
+      .select()
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    // Increment view count
-    await supabase
-      .from("marketplace_listings")
-      .update({ views: (data.views || 0) + 1 })
-      .eq("id", id);
+    return NextResponse.json({ listing: data[0] })
+  } catch (err) {
+    return NextResponse.json({ error: 'Failed to update listing' }, { status: 500 })
+  }
+}
 
-    return NextResponse.json({ listing: data });
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch listing" }, { status: 500 });
+export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+  try {
+    const { error } = await supabase
+      .from('marketplace_listings')
+      .delete()
+      .eq('id', params.id)
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ message: 'Listing deleted' })
+  } catch (err) {
+    return NextResponse.json({ error: 'Failed to delete listing' }, { status: 500 })
   }
 }

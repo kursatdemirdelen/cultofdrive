@@ -122,20 +122,15 @@ Admin creates cars without owner:
 - **comments.user_id**: ON DELETE SET NULL (comment persists without user)
 - **favorites.user_id**: ON DELETE CASCADE (favorite removed with user)
 
-## Migration Path
+## Database Setup
 
-### Legacy Data Handling
-1. Old cars may have owner text field populated
-2. New cars only use user_id relationship
-3. Display logic prefers user_profiles join over legacy owner field
-4. Gradual migration as users claim/update their builds
-
-### Orphan Prevention
-Migration script `fix_orphan_comments.sql`:
-1. Creates user_profiles for existing auth.users
-2. Cleans orphan records (no matching user)
-3. Adds foreign key constraints
-4. Creates RLS policies for data protection
+### Single Setup File
+All database setup is handled by `supabase/setup.sql`:
+1. Creates all tables with proper relationships
+2. Sets up user_profiles with auto-sync triggers
+3. Configures RLS policies for security
+4. Creates indexes for performance
+5. Sets up storage bucket for images
 
 ## Best Practices
 

@@ -50,7 +50,7 @@ export async function POST(request: Request) {
 
     console.log('Uploading file:', fileName);
     const { data: storageData, error: storageError } = await supabase.storage
-      .from('garage')
+      .from('car-images')
       .upload(`public/${fileName}`, buffer, { contentType: 'image/jpeg' });
 
     if (storageError) {

@@ -79,11 +79,11 @@ components/
 ## Data Layer
 
 ### Public Assets (`/public`)
-- `data/` - JSON seed data for development
+- `data/cars.json` - Sample car data for development
 - `images/` - Car photos and static assets
 
 ### Database (`/supabase`)
-- `schema.sql` - Complete database schema with tables, policies, and indexes
+- `setup.sql` - Single complete database setup file
 
 ### Utilities (`/utils`)
 - `supabase.ts` - Server-side Supabase client

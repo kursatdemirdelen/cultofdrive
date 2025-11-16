@@ -72,7 +72,7 @@ export default function CreateListingPage() {
         const filePath = `marketplace/${fileName}`;
 
         const { error: uploadError } = await supabaseBrowser.storage
-          .from("garage")
+          .from("car-images")
           .upload(filePath, imageFile);
 
         if (uploadError) throw uploadError;

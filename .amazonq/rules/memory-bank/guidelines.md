@@ -133,6 +133,7 @@ function normalizeTags(input: unknown): string[] {
 
 ### Environment Setup
 - **Environment Variables**: Use `.env.local` for local development
+- **Database Setup**: Run `supabase/setup.sql` in Supabase SQL Editor
 - **Type Checking**: Run `npm run type-check` before commits
 - **Linting**: Use ESLint configuration for code consistency
 - **Build Verification**: Ensure `npm run build` succeeds
