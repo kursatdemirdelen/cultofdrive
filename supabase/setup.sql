@@ -86,7 +86,11 @@ CREATE TABLE IF NOT EXISTS public.user_profiles (
 
 -- Auto-create profile on signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_catalog
+AS $$
 BEGIN
   INSERT INTO public.user_profiles (id, email, display_name, slug)
   VALUES (
@@ -97,7 +101,7 @@ BEGIN
   );
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
 
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
@@ -106,14 +110,17 @@ CREATE TRIGGER on_auth_user_created
 
 -- Auto-generate slug on update
 CREATE OR REPLACE FUNCTION public.generate_profile_slug()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SET search_path = public, pg_catalog
+AS $$
 BEGIN
   IF NEW.slug IS NULL OR NEW.slug = '' THEN
     NEW.slug := lower(regexp_replace(regexp_replace(trim(NEW.display_name), '\s+', '-', 'g'), '[^a-z0-9\-]', '', 'g'));
   END IF;
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$;
 
 DROP TRIGGER IF EXISTS on_profile_slug_generate ON public.user_profiles;
 CREATE TRIGGER on_profile_slug_generate
