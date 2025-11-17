@@ -23,6 +23,7 @@ import { MarketplacePanel } from "./components/MarketplacePanel";
 import { UsersPanel } from "./components/UsersPanel";
 import { AnalyticsPanel } from "./components/AnalyticsPanel";
 import { AdminTabs } from "./components/AdminTabs";
+import { resolveImageSource } from "@/utils/storage";
 
 type UploadResponse = {
   path: string;
@@ -39,16 +40,7 @@ const EMPTY_FORM: CarFormState = {
   isFeatured: false,
 };
 
-const STORAGE_BASE = process.env.NEXT_PUBLIC_SUPABASE_URL
-  ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/garage/`
-  : "";
-
-const resolveImageUrl = (path?: string | null) => {
-  if (!path) return "";
-  if (path.startsWith("http")) return path;
-  if (!STORAGE_BASE) return path;
-  return `${STORAGE_BASE}${path.replace(/^\/+/, "")}`;
-};
+const resolveImageUrl = (path?: string | null) => resolveImageSource(path);
 
 export default function AdminPage() {
   const [adminKey, setAdminKey] = useState("");

@@ -7,6 +7,7 @@ import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { NewBadge } from "../ui/NewBadge";
 import { isNew } from "@/utils/date";
+import { resolveImageSource } from "@/utils/storage";
 
 export function RecentCars() {
   const { cars, loading } = useCars({ limit: 6 });
@@ -79,7 +80,7 @@ export function RecentCars() {
               >
                 <div className="relative aspect-video overflow-hidden">
                   <Image
-                    src={car.imageUrl.startsWith('public/') ? `/${car.imageUrl.replace('public/', '')}` : car.imageUrl}
+                    src={resolveImageSource(car.imageUrl) || "/images/placeholder-car.jpg"}
                     alt={car.model}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-105"

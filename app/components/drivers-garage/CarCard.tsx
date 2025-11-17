@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import type { Car } from "@/app/types";
 import { UserCircle } from "lucide-react";
+import { resolveImageSource } from "@/utils/storage";
 
 interface CarCardProps {
   car: Car;
@@ -27,7 +28,7 @@ export default function CarCard({ car, index, onClick }: CarCardProps) {
     >
       <div className="relative h-64 overflow-hidden rounded-t-lg">
         <Image
-          src={car.imageUrl.startsWith('public/') ? `/${car.imageUrl.replace('public/', '')}` : car.imageUrl}
+          src={resolveImageSource(car.imageUrl) || "/images/placeholder-car.jpg"}
           alt={car.model}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowLeft, DollarSign, MapPin, Mail, Phone, Calendar, Car, Wrench } from "lucide-react";
 import type { Metadata } from "next";
 import { EditListingButton } from "@/app/components/marketplace/EditListingButton";
+import { resolveImageSource } from "@/utils/storage";
 
 async function getListing(id: string) {
   const base = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
@@ -46,11 +47,7 @@ export default async function ListingDetailPage({ params }: { params: Promise<{ 
             {(listing.image_url || listing.cars?.image_url) ? (
               <div className="relative aspect-video overflow-hidden rounded-xl border border-white/10">
                 <Image
-                  src={
-                    listing.image_url
-                      ? (listing.image_url.startsWith('http') ? listing.image_url : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/garage/${listing.image_url}`)
-                      : (listing.cars?.image_url?.startsWith('public/') ? `/${listing.cars.image_url.replace('public/', '')}` : listing.cars?.image_url || '')
-                  }
+                  src={resolveImageSource(listing.image_url || listing.cars?.image_url) || "/images/placeholder-car.jpg"}
                   alt={listing.title}
                   fill
                   className="object-cover"

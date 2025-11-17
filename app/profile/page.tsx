@@ -8,6 +8,7 @@ import { Edit, Car, Eye, Heart, MessageCircle, Plus } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { EmptyState } from "@/app/components/ui/EmptyState";
+import { resolveImageSource } from "@/utils/storage";
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -167,7 +168,7 @@ export default function ProfilePage() {
                 >
                   <div className="relative aspect-video overflow-hidden">
                     <Image
-                      src={car.imageUrl.startsWith('public/') ? `/${car.imageUrl.replace('public/', '')}` : car.imageUrl}
+                      src={resolveImageSource(car.imageUrl) || "/images/placeholder-car.jpg"}
                       alt={car.model}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-105"

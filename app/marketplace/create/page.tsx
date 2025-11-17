@@ -7,6 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, DollarSign, Car, Wrench } from "lucide-react";
 import { toast } from "@/app/components/ui/Toast";
+import { buildImagePath, storageConfig } from "@/utils/storage";
 
 export default function CreateListingPage() {
   const [user, setUser] = useState<any>(null);
@@ -67,12 +68,16 @@ export default function CreateListingPage() {
 
       if (imageFile) {
         setUploading(true);
-        const fileExt = imageFile.name.split(".").pop();
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-        const filePath = `marketplace/${fileName}`;
+        const fileExt = imageFile.name.split(".").pop() || "jpg";
+        const filePath = buildImagePath({
+          category: "marketplace",
+          ownerId: user.id,
+          label: title,
+          extension: fileExt,
+        });
 
         const { error: uploadError } = await supabaseBrowser.storage
-          .from("car-images")
+          .from(storageConfig.bucket)
           .upload(filePath, imageFile);
 
         if (uploadError) throw uploadError;

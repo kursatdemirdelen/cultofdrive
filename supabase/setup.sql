@@ -334,9 +334,32 @@ ON CONFLICT (id) DO NOTHING;
 
 -- Storage policies
 CREATE POLICY "Public read car images" ON storage.objects FOR SELECT USING (bucket_id = 'car-images');
-CREATE POLICY "Authenticated users can upload" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'car-images' AND auth.role() = 'authenticated');
-CREATE POLICY "Users can update own uploads" ON storage.objects FOR UPDATE USING (bucket_id = 'car-images' AND auth.uid()::text = (storage.foldername(name))[1]);
-CREATE POLICY "Users can delete own uploads" ON storage.objects FOR DELETE USING (bucket_id = 'car-images' AND auth.uid()::text = (storage.foldername(name))[1]);
+CREATE POLICY "Authenticated users can upload" ON storage.objects
+  FOR INSERT WITH CHECK (
+    bucket_id = 'car-images'
+    AND auth.role() = 'authenticated'
+    AND split_part(name, '/', 1) IN ('cars', 'marketplace', 'profiles')
+    AND split_part(name, '/', 2) = auth.uid()::text
+  );
+
+CREATE POLICY "Users can update own uploads" ON storage.objects
+  FOR UPDATE USING (
+    bucket_id = 'car-images'
+    AND split_part(name, '/', 1) IN ('cars', 'marketplace', 'profiles')
+    AND split_part(name, '/', 2) = auth.uid()::text
+  )
+  WITH CHECK (
+    bucket_id = 'car-images'
+    AND split_part(name, '/', 1) IN ('cars', 'marketplace', 'profiles')
+    AND split_part(name, '/', 2) = auth.uid()::text
+  );
+
+CREATE POLICY "Users can delete own uploads" ON storage.objects
+  FOR DELETE USING (
+    bucket_id = 'car-images'
+    AND split_part(name, '/', 1) IN ('cars', 'marketplace', 'profiles')
+    AND split_part(name, '/', 2) = auth.uid()::text
+  );
 
 -- =============================================
 -- STEP 7: Indexes for Performance

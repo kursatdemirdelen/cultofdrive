@@ -9,6 +9,7 @@ import Image from "next/image";
 import { TagInput } from "@/app/components/form/TagInput";
 import { SpecInput } from "@/app/components/form/SpecInput";
 import { toast } from "@/app/components/ui/Toast";
+import { resolveImageSource } from "@/utils/storage";
 
 type Spec = { key: string; value: string };
 
@@ -157,8 +158,8 @@ export default function EditCarPage({ params }: { params: Promise<{ id: string }
 
           {imageUrl && (
             <div className="relative mb-6 aspect-video overflow-hidden rounded-lg">
-              <Image 
-                src={imageUrl.startsWith('public/') ? `/${imageUrl.replace('public/', '')}` : imageUrl} 
+                <Image
+                  src={resolveImageSource(imageUrl) || "/images/placeholder-car.jpg"} 
                 alt={model} 
                 fill 
                 className="object-cover" 

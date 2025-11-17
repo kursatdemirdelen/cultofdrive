@@ -1,6 +1,7 @@
 import { supabase } from '@/utils/supabase';
 import { NextResponse } from 'next/server';
 import type { Car } from '@/app/types';
+import { buildImagePath, storageConfig } from '@/utils/storage';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -42,16 +43,18 @@ export async function POST(request: Request) {
 
     const displayName = profile?.display_name || 'user';
     const buffer = Buffer.from(await file.arrayBuffer());
-    const sanitized = displayName
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-    const fileName = `${sanitized}-${Date.now()}.jpg`;
+    const fileExt = file.name?.split('.').pop() || file.type?.split('/').pop() || 'jpg';
+    const storagePath = buildImagePath({
+      category: 'cars',
+      ownerId: user_id,
+      label: model || displayName,
+      extension: fileExt,
+    });
 
-    console.log('Uploading file:', fileName);
+    console.log('Uploading file:', storagePath);
     const { data: storageData, error: storageError } = await supabase.storage
-      .from('car-images')
-      .upload(`public/${fileName}`, buffer, { contentType: 'image/jpeg' });
+      .from(storageConfig.bucket)
+      .upload(storagePath, buffer, { contentType: file.type || 'application/octet-stream' });
 
     if (storageError) {
       console.error('Storage error:', storageError);

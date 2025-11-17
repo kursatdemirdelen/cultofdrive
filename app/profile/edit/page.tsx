@@ -7,6 +7,7 @@ import { Avatar } from "@/app/components/ui/Avatar";
 import { Camera, Save, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { toast } from "@/app/components/ui/Toast";
+import { buildImagePath, resolveImageSource, storageConfig } from "@/utils/storage";
 
 export default function EditProfilePage() {
   const router = useRouter();
@@ -57,21 +58,21 @@ export default function EditProfilePage() {
       const { data: { user } } = await supabaseBrowser.auth.getUser();
       if (!user) throw new Error("Not authenticated");
 
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${user.id}-${Date.now()}.${fileExt}`;
-      const filePath = `avatars/${fileName}`;
+      const fileExt = file.name.split(".").pop() || "jpg";
+      const filePath = buildImagePath({
+        category: "profiles",
+        ownerId: user.id,
+        label: user.email || user.id,
+        extension: fileExt,
+      });
 
       const { error: uploadError } = await supabaseBrowser.storage
-        .from("garage")
+        .from(storageConfig.bucket)
         .upload(filePath, file, { upsert: true });
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabaseBrowser.storage
-        .from("garage")
-        .getPublicUrl(filePath);
-
-      setProfile((prev) => ({ ...prev, avatar_url: publicUrl }));
+      setProfile((prev) => ({ ...prev, avatar_url: resolveImageSource(filePath) }));
       toast.success("Avatar uploaded!");
     } catch (err: any) {
       toast.error(err.message || "Failed to upload avatar");

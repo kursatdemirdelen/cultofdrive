@@ -11,6 +11,7 @@ import { CarListSkeleton } from "../components/loading/CarListSkeleton";
 import { EmptyState } from "../components/ui/EmptyState";
 import { NewBadge } from "../components/ui/NewBadge";
 import { isNew } from "@/utils/date";
+import { resolveImageSource } from "@/utils/storage";
 
 type ViewMode = "grid" | "list";
 type SortMode = "newest" | "oldest" | "model";
@@ -181,8 +182,8 @@ export default function DiscoverPage() {
                 className="group overflow-hidden rounded-lg border border-white/10 bg-white/[0.02] backdrop-blur-sm transition hover:bg-white/[0.04]"
               >
                 <div className="relative aspect-video overflow-hidden">
-                  <Image
-                    src={car.imageUrl.startsWith('public/') ? `/${car.imageUrl.replace('public/', '')}` : car.imageUrl}
+                    <Image
+                      src={resolveImageSource(car.imageUrl) || "/images/placeholder-car.jpg"}
                     alt={car.model}
                     fill
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -243,8 +244,8 @@ export default function DiscoverPage() {
                 className="group flex gap-4 rounded-lg border border-white/10 bg-white/[0.02] p-3 backdrop-blur-sm transition hover:bg-white/[0.04]"
               >
                 <div className="relative h-24 w-32 flex-shrink-0 overflow-hidden rounded-lg">
-                  <Image
-                    src={car.imageUrl.startsWith('public/') ? `/${car.imageUrl.replace('public/', '')}` : car.imageUrl}
+                    <Image
+                      src={resolveImageSource(car.imageUrl) || "/images/placeholder-car.jpg"}
                     alt={car.model}
                     fill
                     className="object-cover"

@@ -2,6 +2,7 @@ export const runtime = 'nodejs'
 
 import { NextResponse } from 'next/server'
 import { supabase } from '@/utils/supabase'
+import { buildImagePath, getPublicAssetUrl, storageConfig } from '@/utils/storage'
 
 export async function POST(req: Request) {
   try {
@@ -14,20 +15,24 @@ export async function POST(req: Request) {
 
     const arrayBuffer = await file.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
-    const filename = `${Date.now()}-${file.name}`
+    const fileExt = file.name?.split('.').pop() || file.type?.split('/').pop() || 'jpg'
+    const storagePath = buildImagePath({
+      category: 'admin',
+      ownerId: 'admin',
+      label: file.name,
+      extension: fileExt,
+    })
 
     const { data, error } = await supabase.storage
-      .from('car-images')
-      .upload(`admin/${filename}`, buffer, {
-        contentType: file.type,
+      .from(storageConfig.bucket)
+      .upload(storagePath, buffer, {
+        contentType: file.type || 'application/octet-stream',
         cacheControl: '3600'
       })
 
     if (error) throw error
 
-    const { data: { publicUrl } } = supabase.storage
-      .from('car-images')
-      .getPublicUrl(data.path)
+    const publicUrl = getPublicAssetUrl(data.path)
 
     return NextResponse.json({ 
       path: data.path, 

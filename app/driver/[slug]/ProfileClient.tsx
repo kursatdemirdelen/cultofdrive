@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Edit, PlusCircle, Package, Calendar } from "lucide-react";
+import { resolveImageSource } from "@/utils/storage";
 
 type ProfileClientProps = {
   profileId: string;
@@ -107,7 +108,7 @@ export function ProfileClient({ profileId, cars }: ProfileClientProps) {
             >
               <div className="relative aspect-video overflow-hidden">
                 <Image
-                  src={car.imageUrl.startsWith('public/') ? `/${car.imageUrl.replace('public/', '')}` : car.imageUrl}
+                  src={resolveImageSource(car.imageUrl) || "/images/placeholder-car.jpg"}
                   alt={car.model}
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-105"

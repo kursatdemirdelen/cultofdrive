@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { supabase } from '@/utils/supabase'
+import { resolveImageSource } from '@/utils/storage'
 
 type DbCar = {
   id: string
@@ -34,9 +35,6 @@ export async function GET(
     if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 })
 
     const row = data as DbCar
-    const { data: pub } = row.image_url
-      ? supabase.storage.from('garage').getPublicUrl(row.image_url)
-      : { data: { publicUrl: '' } as any }
 
     const specs: string[] = Array.isArray(row.specs)
       ? row.specs.map((s: any) => {
@@ -57,7 +55,7 @@ export async function GET(
       year: row.year ?? undefined,
       owner,
       driverSlug,
-      imageUrl: pub?.publicUrl || row.image_url || '',
+      imageUrl: resolveImageSource(row.image_url) || '',
       description: row.description || '',
       specs,
       tags: row.tags || [],

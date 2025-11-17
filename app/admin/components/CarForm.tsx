@@ -2,6 +2,7 @@ import { Upload, X, Star, Calendar } from "lucide-react";
 import type { CarFormState } from "../types";
 import type { ChangeEvent, FormEvent } from "react";
 import Image from "next/image";
+import { resolveImageSource } from "@/utils/storage";
 
 type Props = {
   form: CarFormState;
@@ -54,7 +55,7 @@ export function CarForm({
             {previewUrl && (
               <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-white/5">
                 <Image
-                  src={previewUrl.startsWith('public/') ? `/${previewUrl.replace('public/', '')}` : previewUrl}
+                  src={previewUrl.startsWith("blob:") ? previewUrl : resolveImageSource(previewUrl) || "/images/placeholder-car.jpg"}
                   alt="Preview"
                   fill
                   className="object-cover"

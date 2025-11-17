@@ -7,6 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, Save, DollarSign, Car, Wrench } from "lucide-react";
 import { toast } from "@/app/components/ui/Toast";
+import { buildImagePath, resolveImageSource, storageConfig } from "@/utils/storage";
 
 export default function EditListingPage({ params }: { params: Promise<{ id: string }> }) {
   const [id, setId] = useState("");
@@ -59,8 +60,7 @@ export default function EditListingPage({ params }: { params: Promise<{ id: stri
         setContactPhone(data.contact_phone || "");
         setCurrentImageUrl(data.image_url || "");
         if (data.image_url) {
-          const url = data.image_url.startsWith("http") ? data.image_url : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/garage/${data.image_url}`;
-          setImagePreview(url);
+          setImagePreview(resolveImageSource(data.image_url));
         }
       } catch (err: any) {
         toast.error(err.message || "Failed to load listing");
@@ -89,13 +89,17 @@ export default function EditListingPage({ params }: { params: Promise<{ id: stri
 
       if (imageFile) {
         setUploading(true);
-        const fileExt = imageFile.name.split(".").pop();
-        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-        const filePath = `marketplace/${fileName}`;
+        const fileExt = imageFile.name.split(".").pop() || "jpg";
+        const filePath = buildImagePath({
+          category: "marketplace",
+          ownerId: user.id,
+          label: title,
+          extension: fileExt,
+        });
 
         const { error: uploadError } = await supabaseBrowser.storage
-          .from("garage")
-          .upload(filePath, imageFile);
+          .from(storageConfig.bucket)
+          .upload(filePath, imageFile, { upsert: true });
 
         if (uploadError) throw uploadError;
         imageUrl = filePath;

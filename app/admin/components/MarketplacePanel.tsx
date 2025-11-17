@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Package, Trash2, Eye, Car, Wrench } from "lucide-react";
 import Image from "next/image";
+import { resolveImageSource } from "@/utils/storage";
 
 type Listing = {
   id: string;
@@ -149,7 +150,7 @@ export function MarketplacePanel({ adminKey }: Props) {
               <div className="relative h-32 sm:h-16 w-full sm:w-24 flex-shrink-0 overflow-hidden rounded bg-white/5">
                 {listing.image_url ? (
                   <Image
-                    src={listing.image_url.startsWith('http') ? listing.image_url : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/garage/${listing.image_url}`}
+                    src={resolveImageSource(listing.image_url) || "/images/placeholder-car.jpg"}
                     alt={listing.title}
                     fill
                     className="object-cover"

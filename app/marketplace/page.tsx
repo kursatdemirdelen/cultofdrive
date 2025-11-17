@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { DollarSign, MapPin, Eye, Plus, Car, Wrench } from "lucide-react";
 import { MarketplaceGridSkeleton } from "../components/loading/MarketplaceSkeleton";
+import { resolveImageSource } from "@/utils/storage";
 
 type Listing = {
   id: string;
@@ -154,21 +155,7 @@ export default function MarketplacePage() {
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {displayedListings.map((listing) => {
-              const getImageUrl = () => {
-                if (listing.image_url) {
-                  return listing.image_url.startsWith('http') 
-                    ? listing.image_url 
-                    : `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/car-images/${listing.image_url}`;
-                }
-                if (listing.cars?.image_url) {
-                  return listing.cars.image_url.startsWith('public/') 
-                    ? `/${listing.cars.image_url.replace('public/', '')}` 
-                    : listing.cars.image_url;
-                }
-                return '';
-              };
-              
-              const imageUrl = getImageUrl();
+              const imageUrl = resolveImageSource(listing.image_url || listing.cars?.image_url);
               
               return (
               <Link
