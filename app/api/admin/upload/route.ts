@@ -1,11 +1,12 @@
 export const runtime = 'nodejs'
 
 import { NextResponse } from 'next/server'
-import { supabase } from '@/utils/supabase'
+import { getAdminSupabaseClient } from '@/utils/admin-supabase'
 import { buildImagePath, getPublicAssetUrl, storageConfig } from '@/utils/storage'
 
 export async function POST(req: Request) {
   try {
+    const supabase = getAdminSupabaseClient()
     const formData = await req.formData()
     const file = formData.get('file') as File
     
