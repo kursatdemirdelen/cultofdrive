@@ -1,7 +1,7 @@
-import { supabase } from '@/utils/supabase';
 import { NextResponse } from 'next/server';
 import type { Car } from '@/app/types';
 import { buildImagePath, storageConfig } from '@/utils/storage';
+import { getAdminSupabaseClient } from '@/utils/admin-supabase';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -10,6 +10,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 export async function POST(request: Request) {
   try {
+    const supabase = getAdminSupabaseClient();
     console.log('Request received:', new Date().toISOString());
     const formData = await request.formData();
     console.log('FormData:', Object.fromEntries(formData as any));
